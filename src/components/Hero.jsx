@@ -44,9 +44,9 @@ export default function Hero() {
             variants={fadeUp} custom={1} initial="hidden" animate="visible"
             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white"
           >
-            Fatura Girişini{' '}
-            <span className="text-gradient">Yapay Zekaya</span>{' '}
-            Bırak
+            Dakikalar Değil,{' '}
+            <span className="text-gradient">Saniyeler:</span>{' '}
+            Fatura Girişinde Yeni Dönem.
           </motion.h1>
 
           {/* Sub */}
@@ -54,7 +54,7 @@ export default function Hero() {
             variants={fadeUp} custom={2} initial="hidden" animate="visible"
             className="text-lg text-slate-400 leading-relaxed max-w-lg"
           >
-            Akınsoft Wolvox entegre masaüstü uygulaması. Fatura girişlerini akıllı eşleştirme ile saniyelere indir; Kasa, Cari ve Tahakkuk hesaplarını %100 uyumlu senkronize et.
+            Akınsoft Wolvox entegreli OtoFatura ile manuel veri girişini tarihe gömün. Faturayı yükleyin, akıllı motorumuzla eşleştirin ve saniyeler içinde veritabanınıza mühürleyin.
           </motion.p>
 
           {/* Highlights */}
@@ -92,6 +92,12 @@ export default function Hero() {
               Nasıl Çalışır?
             </a>
           </motion.div>
+          <motion.p
+            variants={fadeUp} custom={5} initial="hidden" animate="visible"
+            className="text-xs text-slate-600"
+          >
+            Kurulum sadece 2 dakika. Verimlilik ise sonsuz.
+          </motion.p>
         </div>
 
         {/* Right — mockup */}
