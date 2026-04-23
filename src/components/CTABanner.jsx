@@ -3,7 +3,7 @@ import { useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Download, ArrowRight } from 'lucide-react'
 
-const DOWNLOAD_URL = 'https://www.mediafire.com/file/zl2idanh9l589ml/OtoFatura_Setup_v1.0.exe/file'
+const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFatura_Setup_v1.0.exe'
 
 export default function CTABanner() {
   const ref = useRef(null)
@@ -27,7 +27,7 @@ export default function CTABanner() {
 
         <div className="relative px-8 py-14 sm:px-16 text-center flex flex-col items-center gap-6">
           <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5">
-            <span className="text-xs font-semibold text-blue-300 tracking-wide uppercase">Ücretsiz Dene</span>
+            <span className="text-xs font-semibold text-blue-300 tracking-wide uppercase">Hemen Başla</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">

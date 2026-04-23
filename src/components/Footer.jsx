@@ -16,12 +16,12 @@ export default function Footer() {
 
         {/* Center */}
         <p className="text-xs text-slate-600 text-center">
-          © {new Date().getFullYear()} OtoFatura · Akınsoft Wolvox için geliştirilmiştir · Tüm hakları saklıdır.
+          © 2026 Selim Akıncı ve Oto Fatura. Tüm Hakları Saklıdır.
         </p>
 
         {/* Right */}
         <p className="text-xs text-slate-700">
-          Powered by <span className="text-slate-500">Gemini AI</span>
+          Akınsoft <span className="text-slate-500">Wolvox</span> için geliştirildi
         </p>
       </div>
     </footer>

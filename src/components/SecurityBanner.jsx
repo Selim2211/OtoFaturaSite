@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { Lock, Server, WifiOff, ShieldCheck } from 'lucide-react'
+import { Lock, Server, ArrowLeftRight, ShieldCheck } from 'lucide-react'
 
 const points = [
-  { icon: WifiOff, label: 'İnternet Bağlantısı Gerekmez' },
+  { icon: ArrowLeftRight, label: 'Doğrudan ERP Aktarımı' },
   { icon: Server, label: 'Lokal Firebird Veritabanı' },
   { icon: ShieldCheck, label: 'Şifreli Kimlik Bilgisi Depolama' },
 ]
