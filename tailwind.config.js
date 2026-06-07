@@ -4,31 +4,32 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy: {
-          950: '#020917',
-          900: '#060e1e',
-          800: '#0a1628',
-          700: '#0f1f3d',
+        brand: {
+          50:  '#e6f0f9',
+          100: '#bdd6f0',
+          200: '#90b9e5',
+          300: '#619cd9',
+          400: '#3a85d0',
+          500: '#0f6ec8',
+          600: '#0c61b3',
+          700: '#005B9F',
+          800: '#07459a',
+          900: '#052e81',
         },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         float: 'float 6s ease-in-out infinite',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-12px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
     },
   },
   plugins: [],
 }
-
