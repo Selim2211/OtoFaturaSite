@@ -3,7 +3,7 @@ import { useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Download, ArrowRight } from 'lucide-react'
 
-const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFatura_Setup_v1.0.exe'
+const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/Demov1/OtoFatura_Setup_v1.0.0.exe'
 
 export default function CTABanner() {
   const ref = useRef(null)

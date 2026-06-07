@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Zap, Download, Menu, X } from 'lucide-react'
 
-const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFatura_Setup_v1.0.exe'
+const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/Demov1/OtoFatura_Setup_v1.0.0.exe'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
