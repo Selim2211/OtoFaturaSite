@@ -42,7 +42,7 @@ export default function Navbar() {
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-8">
           <a href="#features" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Özellikler</a>
-          <a href="#how-it-works" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Nasıl Çalışır?</a>
+          <a href="#how-it-works" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Nasıl Kullanılır?</a>
           <a href="#faq" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">SSS</a>
           <a
             href={DOWNLOAD_URL}
@@ -69,7 +69,7 @@ export default function Navbar() {
           className="md:hidden bg-white border-t border-slate-100 px-6 py-4 flex flex-col gap-4"
         >
           <a href="#features" className="text-slate-700 hover:text-[#005B9F] text-sm font-medium" onClick={() => setMenuOpen(false)}>Özellikler</a>
-          <a href="#how-it-works" className="text-slate-700 hover:text-[#005B9F] text-sm font-medium" onClick={() => setMenuOpen(false)}>Nasıl Çalışır?</a>
+          <a href="#how-it-works" className="text-slate-700 hover:text-[#005B9F] text-sm font-medium" onClick={() => setMenuOpen(false)}>Nasıl Kullanılır?</a>
           <a href="#faq" className="text-slate-700 hover:text-[#005B9F] text-sm font-medium" onClick={() => setMenuOpen(false)}>SSS</a>
           <a
             href={DOWNLOAD_URL}

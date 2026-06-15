@@ -11,7 +11,7 @@ const fadeUp = {
   }),
 }
 
-const badges = ['Wolvox 8/9 Uyumlu', 'Firebird Direkt Yazım', 'PK Çakışması Yok']
+const badges = ['Wolvox 8/9 Uyumlu', 'Anında ERP Kaydı', 'Çakışmasız Aktarım']
 
 export default function Hero() {
   return (
@@ -47,7 +47,7 @@ export default function Hero() {
             variants={fadeUp} custom={2} initial="hidden" animate="visible"
             className="text-lg text-slate-600 leading-relaxed max-w-lg"
           >
-            Akınsoft Wolvox entegreli OtoFatura ile manuel veri girişini tarihe gömün. 50+ kalemlik faturaları yapay zekaya okutun, PK çakışması yaşamadan saniyeler içinde STOKHR deponuza işleyin.
+            Akınsoft Wolvox entegreli OtoFatura ile manuel veri girişini tarihe gömün. 50+ kalemlik faturaları yapay zekaya okutun, tek tıkla — hatasız ve eksiksiz — stok deponuza işleyin.
           </motion.p>
 
           {/* Checkmarks */}
@@ -76,7 +76,7 @@ export default function Hero() {
               href="#how-it-works"
               className="inline-flex items-center gap-1.5 text-[#005B9F] border border-[#005B9F]/30 hover:border-[#005B9F] bg-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-all duration-200 hover:bg-blue-50"
             >
-              Nasıl Çalışır?
+              Nasıl Kullanılır?
               <ChevronRight size={14} />
             </a>
           </motion.div>

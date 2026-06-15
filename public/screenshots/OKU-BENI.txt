@@ -1,0 +1,9 @@
+Bu klasöre aşağıdaki 5 ekran görüntüsünü TAM bu isimlerle kaydet:
+
+1) adim-1-kurulum.png   → Kurulum sihirbazı ekranı (yeşil ilerleme çubuğu)
+2) adim-2-yukle.png     → Uygulamanın "Sürükle & Bırak" ana ekranı
+3) adim-3-incele.png    → Taranan fatura kalemleri + "Wolvox ERP'ye Aktar" ekranı
+4) adim-4-stok.png      → Akınsoft Wolvox "Stok Hareket Raporu" ekranı
+5) adim-4-cari.png       → Akınsoft Wolvox cari satırı (AYDIN DAYANIKLI ...)
+
+Dosyaları attıktan sonra site otomatik gösterir. İsimler birebir aynı olmalı (küçük harf, tire ile).

@@ -4,9 +4,9 @@ import { useRef } from 'react'
 import { Lock, Server, ArrowLeftRight, ShieldCheck } from 'lucide-react'
 
 const points = [
-  { icon: ArrowLeftRight, label: 'Doğrudan ERP Aktarımı', desc: 'Verileriniz aracı bulut sunucularına uğramaz, doğrudan kendi Firebird veritabanınıza güvenle yazılır.' },
-  { icon: Server, label: 'Lokal Firebird Veritabanı', desc: 'On-premise mimari. Faturalar ve ERP verisi yalnızca kendi sunucunuzda işlenir.' },
-  { icon: ShieldCheck, label: 'Şifreli Kimlik Bilgisi Depolama', desc: 'Bağlantı şifreleri sistem keyring\'inde AES şifreli saklanır.' },
+  { icon: ArrowLeftRight, label: 'Doğrudan Aktarım', desc: 'Verileriniz aracı bulut sunucularına uğramaz, doğrudan kendi Akınsoft veritabanınıza güvenle yazılır.' },
+  { icon: Server, label: 'Kendi Bilgisayarınızda', desc: 'Faturalarınız ve muhasebe veriniz dışarı çıkmaz; yalnızca sizin bilgisayarınızda işlenir.' },
+  { icon: ShieldCheck, label: 'Şifreli Bağlantı Bilgileri', desc: 'Veritabanı bağlantı şifreleriniz cihazınızda şifrelenerek güvende tutulur.' },
 ]
 
 export default function SecurityBanner() {
