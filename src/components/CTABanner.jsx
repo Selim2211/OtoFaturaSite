@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { Download, ArrowRight } from 'lucide-react'
+import { Download, ArrowRight, Phone } from 'lucide-react'
 
 const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/Demov1/OtoFatura_Setup_v1.0.0.exe'
+const PHONE_DISPLAY = '0543 374 30 60'
+const PHONE_TEL = '+905433743060'
 
 export default function CTABanner() {
   const ref = useRef(null)
@@ -47,6 +49,20 @@ export default function CTABanner() {
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <p className="text-xs text-blue-200">Windows 10/11 · 64-bit · Akınsoft Wolvox 8/9 gerektirir</p>
+
+          {/* Telefon CTA */}
+          <div className="mt-4 flex flex-col items-center gap-2 border-t border-white/15 pt-6 w-full max-w-md">
+            <p className="text-sm text-blue-100">Ücretsiz demo ve bilgi almak için bizi arayın</p>
+            <a
+              href={`tel:${PHONE_TEL}`}
+              className="group inline-flex items-center gap-2.5 text-white font-extrabold text-2xl sm:text-3xl tracking-tight hover:text-blue-100 transition-colors"
+            >
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white/15 group-hover:bg-white/25 transition-colors">
+                <Phone size={18} />
+              </span>
+              {PHONE_DISPLAY}
+            </a>
+          </div>
         </div>
       </motion.div>
     </section>

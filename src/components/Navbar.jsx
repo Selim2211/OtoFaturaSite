@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Download, Menu, X } from 'lucide-react'
+import { Download, Menu, X, Phone } from 'lucide-react'
 
 const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/Demov1/OtoFatura_Setup_v1.0.0.exe'
+const PHONE_DISPLAY = '0543 374 30 60'
+const PHONE_TEL = '+905433743060'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -27,23 +29,22 @@ export default function Navbar() {
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#005B9F] flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M9 13h6M9 17h4" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <span className="font-bold text-lg text-slate-900 tracking-tight">
-            Oto<span className="text-brand-gradient">Fatura</span>
-          </span>
-        </div>
+        <a href="#" className="flex items-center">
+          <img src="/logo.png" alt="OtoFatura" className="h-8 w-auto" />
+        </a>
 
         {/* Desktop */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-7">
           <a href="#features" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Özellikler</a>
           <a href="#how-it-works" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Nasıl Kullanılır?</a>
           <a href="#faq" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">SSS</a>
+          <a
+            href={`tel:${PHONE_TEL}`}
+            className="flex items-center gap-1.5 text-sm text-[#005B9F] hover:text-[#004a82] transition-colors font-semibold"
+          >
+            <Phone size={14} />
+            {PHONE_DISPLAY}
+          </a>
           <a
             href={DOWNLOAD_URL}
             target="_blank"
@@ -71,6 +72,10 @@ export default function Navbar() {
           <a href="#features" className="text-slate-700 hover:text-[#005B9F] text-sm font-medium" onClick={() => setMenuOpen(false)}>Özellikler</a>
           <a href="#how-it-works" className="text-slate-700 hover:text-[#005B9F] text-sm font-medium" onClick={() => setMenuOpen(false)}>Nasıl Kullanılır?</a>
           <a href="#faq" className="text-slate-700 hover:text-[#005B9F] text-sm font-medium" onClick={() => setMenuOpen(false)}>SSS</a>
+          <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-1.5 text-[#005B9F] text-sm font-semibold">
+            <Phone size={14} />
+            {PHONE_DISPLAY}
+          </a>
           <a
             href={DOWNLOAD_URL}
             target="_blank"
