@@ -35,6 +35,7 @@ export default function Navbar() {
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-7">
+          <a href="#video" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Video</a>
           <a href="#features" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Özellikler</a>
           <a href="#how-it-works" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">Nasıl Kullanılır?</a>
           <a href="#faq" className="text-sm text-slate-600 hover:text-[#005B9F] transition-colors font-medium">SSS</a>

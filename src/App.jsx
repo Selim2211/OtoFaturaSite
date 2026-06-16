@@ -1,5 +1,6 @@
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import VideoSection from './components/VideoSection'
 import HowToUse from './components/HowToUse'
 import Features from './components/Features'
 import SecurityBanner from './components/SecurityBanner'
@@ -13,6 +14,7 @@ export default function App() {
     <div className="min-h-screen bg-white text-slate-900 overflow-x-hidden">
       <Navbar />
       <Hero />
+      <VideoSection />
       <HowToUse />
       <Features />
       <SecurityBanner />
