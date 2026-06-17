@@ -69,7 +69,7 @@ export default function Hero() {
               className="group inline-flex items-center gap-2.5 bg-[#005B9F] hover:bg-[#004a82] text-white font-bold px-6 py-3.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg text-sm"
             >
               <Download size={16} />
-              Hemen İndir (v1.5.0)
+              Hemen İndir (v1.6)
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
@@ -104,7 +104,7 @@ export default function Hero() {
                 <div className="w-3 h-3 rounded-full bg-red-400" />
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
                 <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <span className="ml-3 text-xs text-slate-400 font-mono">OtoFatura v1.5.0</span>
+                <span className="ml-3 text-xs text-slate-400 font-mono">OtoFatura v1.6</span>
               </div>
               {/* Content */}
               <div className="p-5 flex flex-col gap-3 bg-slate-50/50">

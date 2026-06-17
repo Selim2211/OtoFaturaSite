@@ -45,7 +45,7 @@ export default function CTABanner() {
             className="group inline-flex items-center gap-3 bg-white text-[#005B9F] font-bold px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:bg-blue-50 text-base"
           >
             <Download size={18} />
-            Hemen İndir (Windows v1.5.0)
+            Hemen İndir (Windows v1.6)
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <p className="text-xs text-blue-200">Windows 10/11 · 64-bit · Akınsoft Wolvox 8/9 gerektirir</p>

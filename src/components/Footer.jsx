@@ -30,7 +30,7 @@ export default function Footer() {
               className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
             >
               <Download size={13} />
-              İndir (v1.5.0)
+              İndir (v1.6)
             </a>
           </div>
 
