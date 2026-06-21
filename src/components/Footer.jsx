@@ -1,6 +1,6 @@
 import { Download, Phone } from 'lucide-react'
 
-const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.6.0.exe'
+const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.0.0.exe'
 const PHONE_DISPLAY = '0543 374 30 60'
 const PHONE_TEL = '+905433743060'
 
@@ -30,7 +30,7 @@ export default function Footer() {
               className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
             >
               <Download size={13} />
-              İndir (v1.6)
+              İndir (v1.0)
             </a>
           </div>
 

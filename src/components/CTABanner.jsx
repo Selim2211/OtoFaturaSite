@@ -3,7 +3,7 @@ import { useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Download, ArrowRight, Phone } from 'lucide-react'
 
-const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.6.0.exe'
+const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.0.0.exe'
 const PHONE_DISPLAY = '0543 374 30 60'
 const PHONE_TEL = '+905433743060'
 
@@ -45,7 +45,7 @@ export default function CTABanner() {
             className="group inline-flex items-center gap-3 bg-white text-[#005B9F] font-bold px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:bg-blue-50 text-base"
           >
             <Download size={18} />
-            Hemen İndir (Windows v1.6)
+            Hemen İndir (Windows v1.0)
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <p className="text-xs text-blue-200">Windows 10/11 · 64-bit · Akınsoft Wolvox 8/9 gerektirir</p>
