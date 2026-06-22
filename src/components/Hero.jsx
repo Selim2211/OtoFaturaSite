@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Download, ArrowRight, ChevronRight, CheckCircle2 } from 'lucide-react'
 
-const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.0.0.exe'
+const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.0.1.exe'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
