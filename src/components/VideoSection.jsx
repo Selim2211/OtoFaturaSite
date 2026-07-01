@@ -2,8 +2,7 @@ import { useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Play, Clapperboard } from 'lucide-react'
 
-const VIDEO_ID = 'tWfSSmEJ57w'
-const THUMB = `https://img.youtube.com/vi/${VIDEO_ID}/maxresdefault.jpg`
+const VIDEO_ID = 'itnsn_Ml1fg'
 const EMBED = `https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`
 
 export default function VideoSection() {
@@ -63,21 +62,34 @@ export default function VideoSection() {
                 className="group absolute inset-0 w-full h-full"
                 aria-label="Videoyu oynat"
               >
-                {/* Thumbnail */}
-                <img
-                  src={THUMB}
-                  alt="OtoFatura tanıtım videosu önizleme"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  onError={(e) => { e.currentTarget.src = `https://img.youtube.com/vi/${VIDEO_ID}/hqdefault.jpg` }}
+                {/* Markalı kapak — kendi logomuz */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1e33] to-slate-950" />
+                {/* Hafif grid dokusu */}
+                <div
+                  className="absolute inset-0 opacity-[0.12]"
+                  style={{
+                    backgroundImage:
+                      'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '48px 48px',
+                  }}
                 />
-                {/* Dark overlay */}
-                <div className="absolute inset-0 bg-slate-900/30 group-hover:bg-slate-900/20 transition-colors" />
-                {/* Play button */}
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="flex items-center justify-center w-20 h-20 rounded-full bg-[#005B9F] text-white shadow-xl shadow-blue-900/30 group-hover:scale-110 transition-transform duration-200">
+                {/* Mavi glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-[#005B9F]/25 blur-3xl rounded-full" />
+
+                {/* İçerik: logo + play + etiket */}
+                <div className="relative z-10 flex flex-col items-center justify-center h-full gap-6 px-6">
+                  <img
+                    src="/logo.png"
+                    alt="OtoFatura"
+                    className="h-12 sm:h-16 w-auto drop-shadow-lg"
+                  />
+                  <span className="flex items-center justify-center w-20 h-20 rounded-full bg-[#005B9F] text-white shadow-xl shadow-blue-900/40 group-hover:scale-110 transition-transform duration-200">
                     <Play size={30} className="ml-1" fill="white" />
                   </span>
-                </span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-slate-300">
+                    Tanıtımı İzle
+                  </span>
+                </div>
               </button>
             )}
           </div>
