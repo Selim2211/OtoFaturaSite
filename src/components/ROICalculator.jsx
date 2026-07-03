@@ -44,8 +44,9 @@ export default function ROICalculator() {
   const itemsPos = ((items - 1) / (50 - 1)) * 100
 
   return (
-    <section className="py-20 px-6 bg-white">
-      <div className="max-w-4xl mx-auto">
+    <section className="py-20 px-6 bg-void relative overflow-hidden">
+      <div className="aurora top-1/3 left-1/4 w-[26rem] h-[26rem] bg-signal/8" />
+      <div className="max-w-4xl mx-auto relative">
         <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
@@ -53,37 +54,37 @@ export default function ROICalculator() {
           transition={{ duration: 0.55 }}
           className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-2 bg-blue-50 text-[#005B9F] text-xs font-bold px-3 py-1.5 rounded-full border border-blue-100 mb-4 uppercase tracking-wider">
+          <span className="inline-flex items-center gap-2 chip text-xs font-bold px-3 py-1.5 rounded-full mb-4 uppercase tracking-wider">
             <TrendingUp size={12} />
             ROI Hesaplayıcı
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+          <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-ink-50 tracking-tight mb-3">
             Ayda Ne Kadar{' '}
-            <span className="text-brand-gradient">Zaman Kazanırsın?</span>
+            <span className="text-grad">Zaman Kazanırsın?</span>
           </h2>
-          <p className="text-slate-600 text-sm">Aylık fatura sayını ve ortalama kalem sayısını gir, hesaplayalım.</p>
+          <p className="text-ink-300 text-sm">Aylık fatura sayını ve ortalama kalem sayısını gir, hesaplayalım.</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden"
+          className="glass-strong edge-top rounded-2xl overflow-hidden"
         >
           <div className="px-8 pt-8 pb-6">
             {/* Slider 1 — fatura sayısı */}
             <div className="mb-7">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-slate-600 font-semibold">Aylık Fatura Sayısı</span>
-                <span className="text-2xl font-extrabold text-[#005B9F]">{count}</span>
+                <span className="text-sm text-ink-300 font-semibold">Aylık Fatura Sayısı</span>
+                <span className="font-data text-2xl font-extrabold text-grad">{count}</span>
               </div>
               <input
                 type="range" min={5} max={500} step={5} value={count}
                 onChange={e => setCount(Number(e.target.value))}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                style={{ background: `linear-gradient(to right, #005B9F 0%, #005B9F ${countPos}%, #e2e8f0 ${countPos}%, #e2e8f0 100%)` }}
+                style={{ background: `linear-gradient(to right, #2563EB 0%, #38E1FF ${countPos}%, rgba(255,255,255,0.08) ${countPos}%, rgba(255,255,255,0.08) 100%)` }}
               />
-              <div className="flex justify-between mt-1.5 text-xs text-slate-400">
+              <div className="font-data flex justify-between mt-1.5 text-xs text-ink-500">
                 <span>5</span><span>500</span>
               </div>
             </div>
@@ -91,70 +92,73 @@ export default function ROICalculator() {
             {/* Slider 2 — ortalama kalem sayısı */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-slate-600 font-semibold">
+                <span className="text-sm text-ink-300 font-semibold">
                   Fatura Başına Ortalama Kalem
                 </span>
-                <span className="text-2xl font-extrabold text-[#005B9F]">{items}</span>
+                <span className="font-data text-2xl font-extrabold text-grad">{items}</span>
               </div>
               <input
                 type="range" min={1} max={50} step={1} value={items}
                 onChange={e => setItems(Number(e.target.value))}
                 className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                style={{ background: `linear-gradient(to right, #005B9F 0%, #005B9F ${itemsPos}%, #e2e8f0 ${itemsPos}%, #e2e8f0 100%)` }}
+                style={{ background: `linear-gradient(to right, #2563EB 0%, #38E1FF ${itemsPos}%, rgba(255,255,255,0.08) ${itemsPos}%, rgba(255,255,255,0.08) 100%)` }}
               />
-              <div className="flex justify-between mt-1.5 text-xs text-slate-400">
+              <div className="font-data flex justify-between mt-1.5 text-xs text-ink-500">
                 <span>1 kalem</span><span>50 kalem</span>
               </div>
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-ink-500">
                 Çok kalemli faturalarda manuel giriş katlanarak uzar; OtoFatura ise faturayı tek seferde okur.
               </p>
             </div>
 
             {/* Comparison */}
             <div className="grid sm:grid-cols-2 gap-4 mb-6">
-              <div className="rounded-xl bg-red-50 border border-red-100 p-4">
+              <div className="rounded-xl bg-red-500/[0.06] border border-red-500/20 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock size={14} className="text-red-500" />
-                  <span className="text-xs font-bold text-red-500 uppercase tracking-wide">Manuel Giriş</span>
+                  <Clock size={14} className="text-red-400" />
+                  <span className="text-xs font-bold text-red-400 uppercase tracking-wide">Manuel Giriş</span>
                 </div>
-                <div className="text-2xl font-extrabold text-slate-900">{fmt(manualTotal)}</div>
-                <div className="text-xs text-slate-500 mt-0.5">~{fmtShort(manualPerInvoice)} / fatura</div>
+                <div className="font-data text-2xl font-extrabold text-ink-50">{fmt(manualTotal)}</div>
+                <div className="text-xs text-ink-500 mt-0.5">~{fmtShort(manualPerInvoice)} / fatura</div>
               </div>
-              <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-4">
+              <div className="rounded-xl bg-emerald-500/[0.06] border border-emerald-500/20 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Zap size={14} className="text-emerald-600" />
-                  <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide">OtoFatura ile</span>
+                  <Zap size={14} className="text-emerald-400" />
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">OtoFatura ile</span>
                 </div>
-                <div className="text-2xl font-extrabold text-slate-900">{fmt(autoTotal)}</div>
-                <div className="text-xs text-slate-500 mt-0.5">~{fmtShort(autoPerInvoice)} / fatura</div>
+                <div className="font-data text-2xl font-extrabold text-ink-50">{fmt(autoTotal)}</div>
+                <div className="text-xs text-ink-500 mt-0.5">~{fmtShort(autoPerInvoice)} / fatura</div>
               </div>
             </div>
 
             {/* Result */}
-            <div className="rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 px-6 py-5 text-center">
-              <p className="text-sm text-slate-600 mb-1">OtoFatura ile ayda</p>
-              <motion.div
-                key={savedHours}
-                initial={{ scale: 0.88, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.3 }}
-                className="text-5xl font-black text-brand-gradient mb-1"
-              >
-                {savedHours} saat
-              </motion.div>
-              <p className="text-sm text-slate-700 font-medium">
-                kazandınız{' '}
-                <span className="text-[#005B9F] font-bold">(%{pct} daha hızlı)</span>
-              </p>
+            <div className="relative rounded-xl border border-signal/25 bg-gradient-to-r from-brand-600/10 to-signal/10 px-6 py-5 text-center overflow-hidden">
+              <div className="absolute inset-0 grid-bg opacity-30" />
+              <div className="relative">
+                <p className="text-sm text-ink-300 mb-1">OtoFatura ile ayda</p>
+                <motion.div
+                  key={savedHours}
+                  initial={{ scale: 0.88, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="font-data text-5xl font-black text-grad text-glow mb-1"
+                >
+                  {savedHours} saat
+                </motion.div>
+                <p className="text-sm text-ink-300 font-medium">
+                  kazandınız{' '}
+                  <span className="font-data text-signal font-bold">(%{pct} daha hızlı)</span>
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="px-8 py-3 bg-slate-50 border-t border-slate-200 text-center">
-            <p className="text-xs text-slate-500">
+          <div className="px-8 py-3 bg-white/[0.02] border-t border-signal/10 text-center">
+            <p className="text-xs text-ink-500">
               Yıllık kazanım:{' '}
-              <span className="font-semibold text-slate-700">{(savedHours * 12).toFixed(0)} saat</span>
+              <span className="font-data font-semibold text-ink-300">{(savedHours * 12).toFixed(0)} saat</span>
               {' '}— yaklaşık{' '}
-              <span className="font-semibold text-slate-700">{Math.round(Number(savedHours) * 12 / 8)} tam iş günü.</span>
+              <span className="font-data font-semibold text-ink-300">{Math.round(Number(savedHours) * 12 / 8)} tam iş günü.</span>
             </p>
           </div>
         </motion.div>
@@ -165,17 +169,18 @@ export default function ROICalculator() {
           -webkit-appearance: none;
           width: 20px; height: 20px;
           border-radius: 50%;
-          background: #005B9F;
+          background: #38E1FF;
           cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 0 0 2px #005B9F40;
+          border: 3px solid #050B18;
+          box-shadow: 0 0 14px 2px rgba(56,225,255,0.55);
         }
         input[type='range']::-moz-range-thumb {
           width: 20px; height: 20px;
           border-radius: 50%;
-          background: #005B9F;
+          background: #38E1FF;
           cursor: pointer;
-          border: 2px solid white;
+          border: 3px solid #050B18;
+          box-shadow: 0 0 14px 2px rgba(56,225,255,0.55);
         }
       `}</style>
     </section>

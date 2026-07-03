@@ -1,5 +1,10 @@
+import { lazy, Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { Download, ArrowRight, ChevronRight, CheckCircle2 } from 'lucide-react'
+import { use3DCapability } from '../hooks/use3DCapability'
+import SceneLoader from './SceneLoader'
+
+const Scene3D = lazy(() => import('./Scene3D'))
 
 const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.0.4.exe'
 
@@ -7,66 +12,73 @@ const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: (i = 0) => ({
     opacity: 1, y: 0,
-    transition: { delay: i * 0.1, duration: 0.55, ease: 'easeOut' },
+    transition: { delay: 0.15 + i * 0.1, duration: 0.6, ease: 'easeOut' },
   }),
 }
 
 const badges = ['Wolvox 8/9 Uyumlu', 'Anında ERP Kaydı', 'Çakışmasız Aktarım']
 
 export default function Hero() {
-  return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-20 bg-white">
-      {/* Subtle grid bg */}
-      <div className="absolute inset-0 bg-grid-light pointer-events-none" />
-      {/* Top-right radial glow */}
-      <div className="absolute top-0 right-0 w-[600px] h-[500px] bg-gradient-radial from-blue-50 via-white to-transparent opacity-70 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 100% 0%, #dbeafe 0%, #ffffff 60%)' }} />
+  const { can3D, quality } = use3DCapability()
 
-      <div className="relative max-w-6xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-16 items-center">
-        {/* LEFT */}
-        <div className="flex flex-col gap-6">
-          {/* Badge */}
+  return (
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-void">
+      {/* 3D katmanı ya da fallback */}
+      <div className="absolute inset-0">
+        {can3D ? (
+          <Suspense fallback={<SceneLoader />}>
+            <Scene3D quality={quality} />
+          </Suspense>
+        ) : (
+          <HeroFallback />
+        )}
+      </div>
+
+      {/* Okunabilirlik: sol koyulaştırma + alt geçiş */}
+      <div className="absolute inset-0 bg-gradient-to-r from-void via-void/75 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-void to-transparent pointer-events-none" />
+
+      {/* İçerik */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 w-full pt-24 pb-16">
+        <div className="max-w-2xl flex flex-col gap-6">
           <motion.div variants={fadeUp} custom={0} initial="hidden" animate="visible">
-            <span className="inline-flex items-center gap-1.5 bg-blue-50 text-[#005B9F] text-xs font-semibold px-3 py-1.5 rounded-full border border-blue-100">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#005B9F] animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 chip text-xs font-semibold px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse shadow-glow-sm" />
               Akınsoft Wolvox Entegrasyonu
             </span>
           </motion.div>
 
-          {/* Headline */}
           <motion.h1
             variants={fadeUp} custom={1} initial="hidden" animate="visible"
-            className="text-4xl sm:text-5xl lg:text-[3.4rem] font-extrabold leading-tight tracking-tight text-slate-900"
+            className="font-display text-4xl sm:text-5xl lg:text-[3.6rem] font-extrabold leading-[1.05] tracking-tight text-ink-50"
           >
             Dakikalar Değil,{' '}
-            <span className="text-brand-gradient">Saniyeler:</span>{' '}
+            <span className="text-grad text-glow">Saniyeler:</span>{' '}
             Fatura Girişinde Yeni Dönem.
           </motion.h1>
 
-          {/* Sub */}
           <motion.p
             variants={fadeUp} custom={2} initial="hidden" animate="visible"
-            className="text-lg text-slate-600 leading-relaxed max-w-lg"
+            className="text-lg text-ink-300 leading-relaxed max-w-lg"
           >
             Akınsoft Wolvox entegreli OtoFatura ile manuel veri girişini tarihe gömün. 50+ kalemlik faturaları yapay zekaya okutun, tek tıkla — hatasız ve eksiksiz — stok deponuza işleyin.
           </motion.p>
 
-          {/* Checkmarks */}
-          <motion.div variants={fadeUp} custom={3} initial="hidden" animate="visible" className="flex flex-wrap gap-3">
+          <motion.div variants={fadeUp} custom={3} initial="hidden" animate="visible" className="flex flex-wrap gap-x-5 gap-y-2">
             {badges.map(b => (
-              <span key={b} className="flex items-center gap-1.5 text-sm text-slate-600">
-                <CheckCircle2 size={14} className="text-[#005B9F] flex-shrink-0" />
+              <span key={b} className="flex items-center gap-1.5 text-sm text-ink-300 font-medium">
+                <CheckCircle2 size={14} className="text-signal flex-shrink-0" />
                 {b}
               </span>
             ))}
           </motion.div>
 
-          {/* CTA */}
           <motion.div variants={fadeUp} custom={4} initial="hidden" animate="visible" className="flex flex-wrap gap-3 mt-1">
             <a
               href={DOWNLOAD_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2.5 bg-[#005B9F] hover:bg-[#004a82] text-white font-bold px-6 py-3.5 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg text-sm"
+              className="group inline-flex items-center gap-2.5 bg-gradient-to-r from-brand-700 to-brand-500 hover:from-brand-600 hover:to-signal text-white font-bold px-6 py-3.5 rounded-xl transition-all duration-200 glow-blue hover:scale-[1.03] text-sm cursor-pointer"
             >
               <Download size={16} />
               Hemen İndir (v1.0.4)
@@ -74,72 +86,45 @@ export default function Hero() {
             </a>
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-1.5 text-[#005B9F] border border-[#005B9F]/30 hover:border-[#005B9F] bg-white font-semibold px-6 py-3.5 rounded-xl text-sm transition-all duration-200 hover:bg-blue-50"
+              className="inline-flex items-center gap-1.5 text-ink-50 glass hover:border-signal/40 font-semibold px-6 py-3.5 rounded-xl text-sm transition-all duration-200 cursor-pointer"
             >
               Nasıl Kullanılır?
               <ChevronRight size={14} />
             </a>
           </motion.div>
 
-          {/* Small note */}
-          <motion.p variants={fadeUp} custom={5} initial="hidden" animate="visible" className="text-xs text-slate-400">
+          <motion.p variants={fadeUp} custom={5} initial="hidden" animate="visible" className="font-data text-xs text-ink-500">
             Windows 10/11 · 64-bit · Kurulum 2 dakika. Verimlilik ise sonsuz.
           </motion.p>
         </div>
-
-        {/* RIGHT — mockup */}
-        <motion.div
-          initial={{ opacity: 0, x: 32 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.7, delay: 0.25 }}
-          className="hidden lg:flex justify-center"
-        >
-          <div className="relative animate-float">
-            {/* Shadow */}
-            <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-blue-100 to-blue-50 blur-2xl opacity-60" />
-            {/* Window */}
-            <div className="relative bg-white rounded-2xl border border-slate-200 shadow-xl w-[460px] overflow-hidden">
-              {/* Chrome */}
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-slate-50 border-b border-slate-200">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                <span className="ml-3 text-xs text-slate-400 font-mono">OtoFatura v1.0.4</span>
-              </div>
-              {/* Content */}
-              <div className="p-5 flex flex-col gap-3 bg-slate-50/50">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                    <span className="text-xs text-emerald-700 font-semibold">Wolvox Bağlantısı Aktif</span>
-                  </div>
-                  <span className="text-xs text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">14 fatura işlendi</span>
-                </div>
-                {/* Upload zone */}
-                <div className="border-2 border-dashed border-blue-200 rounded-xl p-4 text-center bg-blue-50/40">
-                  <div className="text-xl mb-1">📄</div>
-                  <div className="text-xs text-slate-500 font-medium">Fatura PDF'ini sürükle & bırak</div>
-                </div>
-                {/* Rows */}
-                {[
-                  { name: 'SAMSUNG SSD 1TB', match: '%98', ok: true },
-                  { name: 'LOGITECH MX KEYS', match: '%94', ok: true },
-                  { name: 'HDMI KABLO 3MT', match: '%71', ok: false },
-                  { name: 'USB HUB 4 PORT', match: '%89', ok: true },
-                ].map((r, i) => (
-                  <div key={i} className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-3 py-2.5 shadow-sm">
-                    <span className="text-xs text-slate-700 font-mono truncate flex-1">{r.name}</span>
-                    <span className={`text-xs font-bold ml-3 ${r.ok ? 'text-emerald-600' : 'text-amber-500'}`}>{r.match}</span>
-                  </div>
-                ))}
-                <button className="w-full bg-[#005B9F] hover:bg-[#004a82] text-white text-xs font-bold py-2.5 rounded-lg mt-1 transition-colors">
-                  Wolvox'a Aktar →
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </div>
+
+      {/* Kaydırma ipucu */}
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-ink-500"
+      >
+        <span className="font-data text-[10px] uppercase tracking-widest">Keşfet</span>
+        <span className="w-5 h-8 rounded-full border border-signal/25 flex justify-center pt-1.5 bg-white/[0.02]">
+          <motion.span
+            className="w-1 h-1.5 rounded-full bg-signal"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity }}
+          />
+        </span>
+      </motion.div>
     </section>
+  )
+}
+
+/* 3D yokken (mobil/reduced-motion/düşük güç) gösterilen şık atmosferik fallback */
+function HeroFallback() {
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 grid-bg grid-bg-fade" />
+      <div className="aurora animate-aurora-1 top-[-10%] left-[10%] w-[36rem] h-[36rem] bg-brand-600/20" />
+      <div className="aurora animate-aurora-2 bottom-[-15%] right-[-8%] w-[34rem] h-[34rem] bg-signal/12" />
+      <div className="aurora top-[30%] right-[25%] w-[20rem] h-[20rem] bg-indigo-500/10 animate-glow-pulse" />
+    </div>
   )
 }

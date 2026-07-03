@@ -6,7 +6,8 @@ const PHONE_TEL = '+905433743060'
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-white">
+    <footer className="relative bg-void text-white border-t border-signal/10">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-signal/60 to-transparent" />
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
@@ -27,10 +28,10 @@ export default function Footer() {
               href={DOWNLOAD_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-signal-soft hover:text-signal transition-colors"
             >
               <Download size={13} />
-              İndir (v1.0.4)
+              <span className="font-data">İndir (v1.0.4)</span>
             </a>
           </div>
 
@@ -42,9 +43,9 @@ export default function Footer() {
             </p>
             <a
               href={`tel:${PHONE_TEL}`}
-              className="inline-flex items-center gap-2 text-base font-bold text-white hover:text-blue-300 transition-colors"
+              className="font-data inline-flex items-center gap-2 text-base font-bold text-white hover:text-signal-soft transition-colors"
             >
-              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#005B9F]">
+              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-brand-600 to-signal">
                 <Phone size={15} />
               </span>
               {PHONE_DISPLAY}

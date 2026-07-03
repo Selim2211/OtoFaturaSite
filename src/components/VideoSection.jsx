@@ -5,14 +5,20 @@ import { Play, Clapperboard } from 'lucide-react'
 const VIDEO_ID = 'itnsn_Ml1fg'
 const EMBED = `https://www.youtube.com/embed/${VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`
 
+/* Holografik hedef köşeleri — viewfinder/reticle hissi */
+function Corner({ className }) {
+  return <span className={`absolute w-6 h-6 border-signal/70 ${className}`} />
+}
+
 export default function VideoSection() {
   const [playing, setPlaying] = useState(false)
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
-    <section id="video" className="py-24 px-6 bg-slate-50 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid-light opacity-40 pointer-events-none" />
+    <section id="video" className="py-24 px-6 bg-void-panel relative overflow-hidden">
+      <div className="absolute inset-0 grid-bg grid-bg-fade opacity-50 pointer-events-none" />
+      <div className="aurora top-1/4 left-1/3 w-[30rem] h-[30rem] bg-signal/8" />
 
       <div className="relative max-w-4xl mx-auto">
         {/* Header */}
@@ -23,15 +29,15 @@ export default function VideoSection() {
           transition={{ duration: 0.55 }}
           className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-2 bg-blue-50 text-[#005B9F] text-xs font-bold px-3 py-1.5 rounded-full border border-blue-100 mb-4 uppercase tracking-wider">
+          <span className="inline-flex items-center gap-2 chip text-xs font-bold px-3 py-1.5 rounded-full mb-4 uppercase tracking-wider">
             <Clapperboard size={12} />
             Tanıtım Videosu
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-ink-50 tracking-tight mb-4">
             OtoFatura'yı{' '}
-            <span className="text-brand-gradient">İş Başında İzleyin</span>
+            <span className="text-grad">İş Başında İzleyin</span>
           </h2>
-          <p className="text-slate-600 max-w-xl mx-auto text-base leading-relaxed">
+          <p className="text-ink-300 max-w-xl mx-auto text-base leading-relaxed">
             Bir faturanın saniyeler içinde nasıl Akınsoft'a işlendiğini kendi gözlerinizle görün.
           </p>
         </motion.div>
@@ -44,9 +50,15 @@ export default function VideoSection() {
           className="relative"
         >
           {/* Glow */}
-          <div className="absolute -inset-3 bg-gradient-to-br from-blue-200 to-indigo-100 rounded-3xl blur-2xl opacity-60 -z-10" />
+          <div className="absolute -inset-3 bg-gradient-to-br from-signal/20 to-brand-600/20 rounded-3xl blur-2xl opacity-70 -z-10" />
 
-          <div className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-slate-900">
+          {/* Holografik hedef köşeleri */}
+          <Corner className="-top-2 -left-2 border-t-2 border-l-2 rounded-tl-lg" />
+          <Corner className="-top-2 -right-2 border-t-2 border-r-2 rounded-tr-lg" />
+          <Corner className="-bottom-2 -left-2 border-b-2 border-l-2 rounded-bl-lg" />
+          <Corner className="-bottom-2 -right-2 border-b-2 border-r-2 rounded-br-lg" />
+
+          <div className="relative aspect-video rounded-2xl overflow-hidden border border-signal/15 shadow-glow bg-void">
             {playing ? (
               <iframe
                 className="absolute inset-0 w-full h-full"
@@ -59,34 +71,31 @@ export default function VideoSection() {
               <button
                 type="button"
                 onClick={() => setPlaying(true)}
-                className="group absolute inset-0 w-full h-full"
+                className="group absolute inset-0 w-full h-full cursor-pointer"
                 aria-label="Videoyu oynat"
               >
-                {/* Markalı kapak — kendi logomuz */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1e33] to-slate-950" />
-                {/* Hafif grid dokusu */}
+                {/* Markalı kapak */}
+                <div className="absolute inset-0 bg-gradient-to-br from-void-elevated via-void-panel to-void" />
                 <div
-                  className="absolute inset-0 opacity-[0.12]"
+                  className="absolute inset-0 opacity-[0.14]"
                   style={{
                     backgroundImage:
-                      'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+                      'linear-gradient(rgba(56,225,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(56,225,255,0.5) 1px, transparent 1px)',
                     backgroundSize: '48px 48px',
                   }}
                 />
-                {/* Mavi glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-[#005B9F]/25 blur-3xl rounded-full" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-signal/20 blur-3xl rounded-full" />
 
-                {/* İçerik: logo + play + etiket */}
                 <div className="relative z-10 flex flex-col items-center justify-center h-full gap-6 px-6">
                   <img
                     src="/logo.png"
                     alt="OtoFatura"
                     className="h-12 sm:h-16 w-auto drop-shadow-lg"
                   />
-                  <span className="flex items-center justify-center w-20 h-20 rounded-full bg-[#005B9F] text-white shadow-xl shadow-blue-900/40 group-hover:scale-110 transition-transform duration-200">
+                  <span className="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-brand-600 to-signal text-white shadow-glow group-hover:scale-110 transition-transform duration-200">
                     <Play size={30} className="ml-1" fill="white" />
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-slate-300">
+                  <span className="font-data text-xs font-semibold uppercase tracking-widest text-ink-300">
                     Tanıtımı İzle
                   </span>
                 </div>

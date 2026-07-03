@@ -25,14 +25,14 @@ function FAQItem({ item, i }) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: i * 0.07, duration: 0.45 }}
-      className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:border-[#005B9F]/30 transition-colors duration-200"
+      className="neon-card rounded-xl overflow-hidden"
     >
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left gap-4"
+        className="w-full flex items-center justify-between px-6 py-4 text-left gap-4 cursor-pointer"
       >
-        <span className="text-sm font-semibold text-slate-800">{item.q}</span>
-        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }} className="flex-shrink-0 text-slate-400">
+        <span className="text-sm font-semibold text-ink-50">{item.q}</span>
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }} className="flex-shrink-0 text-signal">
           <ChevronDown size={18} />
         </motion.div>
       </button>
@@ -46,7 +46,7 @@ function FAQItem({ item, i }) {
             transition={{ duration: 0.28, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <p className="px-6 pb-5 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+            <p className="px-6 pb-5 text-sm text-ink-300 leading-relaxed border-t border-signal/10 pt-3">
               {item.a}
             </p>
           </motion.div>
@@ -61,8 +61,9 @@ export default function FAQ() {
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section id="faq" className="py-20 px-6 bg-slate-50">
-      <div className="max-w-2xl mx-auto">
+    <section id="faq" className="py-20 px-6 bg-void relative overflow-hidden">
+      <div className="aurora top-1/4 right-1/4 w-[24rem] h-[24rem] bg-signal/6" />
+      <div className="max-w-2xl mx-auto relative">
         <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
@@ -70,14 +71,14 @@ export default function FAQ() {
           transition={{ duration: 0.55 }}
           className="text-center mb-10"
         >
-          <span className="inline-block bg-blue-50 text-[#005B9F] text-xs font-bold px-3 py-1.5 rounded-full border border-blue-100 mb-4 uppercase tracking-wider">
+          <span className="inline-block chip text-xs font-bold px-3 py-1.5 rounded-full mb-4 uppercase tracking-wider">
             SSS
           </span>
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-3">
+          <h2 className="font-display text-3xl font-extrabold text-ink-50 tracking-tight mb-3">
             Sıkça Sorulan{' '}
-            <span className="text-brand-gradient">Sorular</span>
+            <span className="text-grad">Sorular</span>
           </h2>
-          <p className="text-slate-600 text-sm">Aklınızdaki soruların yanıtları burada.</p>
+          <p className="text-ink-300 text-sm">Aklınızdaki soruların yanıtları burada.</p>
         </motion.div>
         <div className="flex flex-col gap-3">
           {faqs.map((item, i) => <FAQItem key={item.q} item={item} i={i} />)}
