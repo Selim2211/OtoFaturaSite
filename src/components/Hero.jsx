@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Download, ArrowRight, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { use3DCapability } from '../hooks/use3DCapability'
@@ -20,14 +20,28 @@ const badges = ['Wolvox 8/9 Uyumlu', 'Anında ERP Kaydı', 'Çakışmasız Aktar
 
 export default function Hero() {
   const { can3D, quality } = use3DCapability()
+  const sectionRef = useRef(null)
+  const [heroVisible, setHeroVisible] = useState(true)
+
+  // Hero ekran dışına çıkınca R3F render döngüsünü tamamen durdur —
+  // scroll sırasında GPU/ana thread'i boşa meşgul etmemesi için.
+  useEffect(() => {
+    if (!sectionRef.current) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setHeroVisible(entry.isIntersecting),
+      { threshold: 0 }
+    )
+    obs.observe(sectionRef.current)
+    return () => obs.disconnect()
+  }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-void">
+    <section ref={sectionRef} className="relative min-h-screen flex items-center overflow-hidden bg-void">
       {/* 3D katmanı ya da fallback */}
       <div className="absolute inset-0">
         {can3D ? (
           <Suspense fallback={<SceneLoader />}>
-            <Scene3D quality={quality} />
+            <Scene3D quality={quality} active={heroVisible} />
           </Suspense>
         ) : (
           <HeroFallback />
@@ -122,9 +136,9 @@ function HeroFallback() {
   return (
     <div className="absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 grid-bg grid-bg-fade" />
-      <div className="aurora animate-aurora-1 top-[-10%] left-[10%] w-[36rem] h-[36rem] bg-brand-600/20" />
-      <div className="aurora animate-aurora-2 bottom-[-15%] right-[-8%] w-[34rem] h-[34rem] bg-signal/12" />
-      <div className="aurora top-[30%] right-[25%] w-[20rem] h-[20rem] bg-indigo-500/10 animate-glow-pulse" />
+      <div className="aurora aurora-anim animate-aurora-1 top-[-10%] left-[10%] w-[36rem] h-[36rem] bg-brand-600/20" />
+      <div className="aurora aurora-anim animate-aurora-2 bottom-[-15%] right-[-8%] w-[34rem] h-[34rem] bg-signal/12" />
+      <div className="aurora aurora-anim top-[30%] right-[25%] w-[20rem] h-[20rem] bg-indigo-500/10 animate-glow-pulse" />
     </div>
   )
 }

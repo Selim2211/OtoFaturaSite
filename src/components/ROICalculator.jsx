@@ -71,7 +71,7 @@ export default function ROICalculator() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="glass-strong edge-top rounded-2xl overflow-hidden"
         >
-          <div className="px-8 pt-8 pb-6">
+          <div className="px-5 sm:px-8 pt-8 pb-6">
             {/* Slider 1 — fatura sayısı */}
             <div className="mb-7">
               <div className="flex items-center justify-between mb-3">
@@ -153,7 +153,7 @@ export default function ROICalculator() {
             </div>
           </div>
 
-          <div className="px-8 py-3 bg-white/[0.02] border-t border-signal/10 text-center">
+          <div className="px-5 sm:px-8 py-3 bg-white/[0.02] border-t border-signal/10 text-center">
             <p className="text-xs text-ink-500">
               Yıllık kazanım:{' '}
               <span className="font-data font-semibold text-ink-300">{(savedHours * 12).toFixed(0)} saat</span>

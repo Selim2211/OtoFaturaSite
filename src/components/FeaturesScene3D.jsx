@@ -23,12 +23,13 @@ function SlowWireframe() {
   )
 }
 
-export default function FeaturesScene3D() {
+export default function FeaturesScene3D({ active = true }) {
   return (
     <Canvas
       dpr={[1, 1.2]}
       gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
       camera={{ position: [0, 0, 7], fov: 40 }}
+      frameloop={active ? 'always' : 'never'}
     >
       <ambientLight intensity={0.6} />
       <SlowWireframe />

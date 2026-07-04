@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
@@ -70,14 +70,27 @@ export default function Features() {
   const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' })
   const { can3D } = use3DCapability()
+  const sectionRef = useRef(null)
+  const [sectionVisible, setSectionVisible] = useState(false)
+
+  // Bu bölüm ekranda değilken minik 3D arka planın render döngüsünü durdur.
+  useEffect(() => {
+    if (!sectionRef.current) return
+    const obs = new IntersectionObserver(
+      ([entry]) => setSectionVisible(entry.isIntersecting),
+      { threshold: 0 }
+    )
+    obs.observe(sectionRef.current)
+    return () => obs.disconnect()
+  }, [])
 
   return (
-    <section id="features" className="py-24 px-6 bg-void-panel relative overflow-hidden">
+    <section ref={sectionRef} id="features" className="py-24 px-6 bg-void-panel relative overflow-hidden">
       {/* Sakin, çok hafif ikinci 3D dokunuş — arka planda yavaşça dönen wireframe */}
       {can3D && (
         <div className="absolute inset-0 opacity-60 pointer-events-none">
           <Suspense fallback={null}>
-            <FeaturesScene3D />
+            <FeaturesScene3D active={sectionVisible} />
           </Suspense>
         </div>
       )}

@@ -61,7 +61,7 @@ export default function FAQ() {
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section id="faq" className="py-20 px-6 bg-void relative overflow-hidden">
+    <section id="faq" className="cv-auto py-20 px-6 bg-void relative overflow-hidden">
       <div className="aurora top-1/4 right-1/4 w-[24rem] h-[24rem] bg-signal/6" />
       <div className="max-w-2xl mx-auto relative">
         <motion.div

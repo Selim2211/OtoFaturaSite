@@ -87,8 +87,20 @@
   .aurora {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(90px);
+    filter: blur(60px);
     pointer-events: none;
+  }
+  /* Yalnızca CSS keyframe ile hareket eden aurora'lara uygulanır — kendi
+     compositor katmanına alınır, scroll sırasında yeniden boyanmaz. */
+  .aurora-anim {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
+  /* Ekran dışındaki alt bölümlerin layout/paint maliyetini tarayıcıya ertelet. */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 600px;
   }
 
   .edge-top { position: relative; }

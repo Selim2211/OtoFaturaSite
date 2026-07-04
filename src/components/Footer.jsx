@@ -6,7 +6,7 @@ const PHONE_TEL = '+905433743060'
 
 export default function Footer() {
   return (
-    <footer className="relative bg-void text-white border-t border-signal/10">
+    <footer className="cv-auto relative bg-void text-white border-t border-signal/10">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-signal/60 to-transparent" />
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">

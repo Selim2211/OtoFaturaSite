@@ -12,8 +12,16 @@ export default function Navbar() {
   const [logoOk, setLogoOk] = useState(true)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16)
-    window.addEventListener('scroll', onScroll)
+    let ticking = false
+    const onScroll = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 16)
+        ticking = false
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -67,8 +75,12 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Mobile toggle */}
-        <button className="md:hidden text-ink-400 hover:text-ink-50 cursor-pointer" onClick={() => setMenuOpen(!menuOpen)}>
+        {/* Mobile toggle — 44x44 dokunma alanı */}
+        <button
+          className="md:hidden -mr-2.5 flex h-11 w-11 items-center justify-center text-ink-400 hover:text-ink-50 cursor-pointer"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+        >
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
@@ -78,13 +90,13 @@ export default function Navbar() {
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="md:hidden glass-strong border-t border-signal/10 px-6 py-4 flex flex-col gap-4"
+          className="md:hidden glass-strong border-t border-signal/10 px-6 py-2 flex flex-col"
         >
-          <a href="#video" className="text-ink-300 hover:text-signal text-sm font-medium" onClick={() => setMenuOpen(false)}>Video</a>
-          <a href="#features" className="text-ink-300 hover:text-signal text-sm font-medium" onClick={() => setMenuOpen(false)}>Özellikler</a>
-          <a href="#how-it-works" className="text-ink-300 hover:text-signal text-sm font-medium" onClick={() => setMenuOpen(false)}>Nasıl Kullanılır?</a>
-          <a href="#faq" className="text-ink-300 hover:text-signal text-sm font-medium" onClick={() => setMenuOpen(false)}>SSS</a>
-          <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-1.5 text-signal-soft text-sm font-semibold font-data">
+          <a href="#video" className="text-ink-300 hover:text-signal text-sm font-medium py-3 border-b border-white/5" onClick={() => setMenuOpen(false)}>Video</a>
+          <a href="#features" className="text-ink-300 hover:text-signal text-sm font-medium py-3 border-b border-white/5" onClick={() => setMenuOpen(false)}>Özellikler</a>
+          <a href="#how-it-works" className="text-ink-300 hover:text-signal text-sm font-medium py-3 border-b border-white/5" onClick={() => setMenuOpen(false)}>Nasıl Kullanılır?</a>
+          <a href="#faq" className="text-ink-300 hover:text-signal text-sm font-medium py-3 border-b border-white/5" onClick={() => setMenuOpen(false)}>SSS</a>
+          <a href={`tel:${PHONE_TEL}`} className="flex items-center gap-1.5 text-signal-soft text-sm font-semibold font-data py-3">
             <Phone size={14} />
             {PHONE_DISPLAY}
           </a>
@@ -92,7 +104,7 @@ export default function Navbar() {
             href={DOWNLOAD_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-gradient-to-r from-brand-700 to-brand-500 text-white text-sm font-semibold px-4 py-2.5 rounded-lg w-fit"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-brand-700 to-brand-500 text-white text-sm font-semibold px-4 py-3 rounded-lg my-3"
           >
             <Download size={14} />
             Hemen İndir

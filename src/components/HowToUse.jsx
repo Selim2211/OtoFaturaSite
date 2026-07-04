@@ -9,7 +9,7 @@ const steps = [
     title: 'Kurulumu 1 Dakikada Tamamlayın',
     desc: 'Tek dosyayı indirin, çift tıklayın. Karmaşık ayar yok, teknik bilgi gerekmez — kurulum sihirbazı gerisini sizin için halleder.',
     tag: 'Kurulum',
-    images: [{ src: '/screenshots/adim-1-kurulum.png', label: 'OtoFatura Kurulum Sihirbazı' }],
+    images: [{ src: '/screenshots/adim-1-kurulum.png', label: 'OtoFatura Kurulum Sihirbazı', w: 599, h: 464 }],
   },
   {
     n: '02',
@@ -17,7 +17,7 @@ const steps = [
     title: 'Faturanızı Sürükleyip Bırakın',
     desc: 'Açılan ekranın ortasındaki alana fatura veya fişlerinizi sürükleyin. PDF, JPG, PNG — hepsi olur. Birden fazla belgeyi aynı anda atabilirsiniz.',
     tag: 'Yükleme',
-    images: [{ src: '/screenshots/adim-2-yukle.png', label: 'Sürükle & Bırak Ekranı' }],
+    images: [{ src: '/screenshots/adim-2-yukle.png', label: 'Sürükle & Bırak Ekranı', w: 1344, h: 889 }],
   },
   {
     n: '03',
@@ -25,7 +25,7 @@ const steps = [
     title: 'Taranan Kalemleri İnceleyin ve Aktarın',
     desc: 'OtoFatura faturayı saniyeler içinde okur; ürünleri ve firmayı kendi kayıtlarınızla eşleştirir. Hızlıca göz atın, doğruysa tek tuşla "Wolvox ERP\'ye Aktar" deyin.',
     tag: 'İnceleme',
-    images: [{ src: '/screenshots/adim-3-incele.png', label: 'Eşleştirilen Fatura Kalemleri' }],
+    images: [{ src: '/screenshots/adim-3-incele.png', label: 'Eşleştirilen Fatura Kalemleri', w: 1915, h: 1007 }],
   },
   {
     n: '04',
@@ -34,14 +34,16 @@ const steps = [
     desc: 'Hepsi bu kadar! Ürünleriniz, fatura ve cari kaydınız anında Akınsoft Wolvox\'a işlenir. Programınızı açıp kontrol edebilirsiniz — her kalem yerli yerinde.',
     tag: 'Sonuç',
     images: [
-      { src: '/screenshots/adim-4-stok.png', label: 'Wolvox Stok Hareket Raporu' },
-      { src: '/screenshots/adim-4-cari.png', label: 'Wolvox Cari Kaydı' },
+      { src: '/screenshots/adim-4-stok.png', label: 'Wolvox Stok Hareket Raporu', w: 1917, h: 186 },
+      { src: '/screenshots/adim-4-cari.png', label: 'Wolvox Cari Kaydı', w: 1284, h: 23 },
     ],
   },
 ]
 
-/* Ekran görüntüsünü tarayıcı/pencere çerçevesi içinde şık gösteren kart */
-function Shot({ src, label }) {
+/* Ekran görüntüsünü tarayıcı/pencere çerçevesi içinde şık gösteren kart.
+ * Gerçek piksel boyutları (w/h) verilerek tarayıcı yükleme öncesi doğru
+ * en-boy oranını hesaplar — resim gelene kadar sayfa zıplamaz (CLS önleme). */
+function Shot({ src, label, w, h }) {
   const handleError = (e) => {
     const el = e.currentTarget
     el.style.display = 'none'
@@ -55,7 +57,7 @@ function Shot({ src, label }) {
         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
         <span className="ml-2 font-data text-[11px] text-ink-400 truncate">{label}</span>
       </div>
-      <img src={src} alt={label} loading="lazy" onError={handleError} className="w-full block" />
+      <img src={src} alt={label} width={w} height={h} loading="lazy" decoding="async" onError={handleError} className="w-full h-auto block" />
       <div className="hidden items-center justify-center h-48 text-ink-500 text-xs flex-col gap-2 bg-void-panel">
         <ScanLine size={22} className="opacity-50" />
         <span>{label}</span>
