@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Download, ArrowRight, ChevronRight, CheckCircle2 } from 'lucide-react'
 import { use3DCapability } from '../hooks/use3DCapability'
 import SceneLoader from './SceneLoader'
+import HeroVisualLite from './HeroVisualLite'
 
 const Scene3D = lazy(() => import('./Scene3D'))
 
@@ -44,13 +45,20 @@ export default function Hero() {
             <Scene3D quality={quality} active={heroVisible} />
           </Suspense>
         ) : (
-          <HeroFallback />
+          <HeroVisualLite />
         )}
       </div>
 
-      {/* Okunabilirlik: sol koyulaştırma + alt geçiş */}
-      <div className="absolute inset-0 bg-gradient-to-r from-void via-void/75 to-transparent pointer-events-none" />
-      <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-void to-transparent pointer-events-none" />
+      {/* Okunabilirlik: mobilde üstten koyu (metin), altta görsel açık kalsın;
+          masaüstünde soldan koyu (metin solda). */}
+      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-void via-void/70 to-transparent md:bg-gradient-to-r md:from-void md:via-void/75 md:to-transparent" />
+      <div className="absolute bottom-0 inset-x-0 h-24 md:h-40 bg-gradient-to-t from-void to-transparent pointer-events-none" />
+
+      {/* Mobil tarama ışını — perdenin üstünde, belirgin hareket (yalnızca telefon) */}
+      <div className="md:hidden absolute inset-x-0 z-[5] h-10 animate-scan-sweep pointer-events-none" style={{ top: '8%' }}>
+        <div className="mx-auto h-[2px] w-[80%] bg-signal shadow-[0_0_16px_3px_rgba(56,225,255,0.7)]" />
+        <div className="mx-auto -mt-5 h-10 w-[80%] bg-gradient-to-b from-signal/15 to-transparent" />
+      </div>
 
       {/* İçerik */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 w-full pt-24 pb-16">
@@ -128,17 +136,5 @@ export default function Hero() {
         </span>
       </motion.div>
     </section>
-  )
-}
-
-/* 3D yokken (mobil/reduced-motion/düşük güç) gösterilen şık atmosferik fallback */
-function HeroFallback() {
-  return (
-    <div className="absolute inset-0 overflow-hidden">
-      <div className="absolute inset-0 grid-bg grid-bg-fade" />
-      <div className="aurora aurora-anim animate-aurora-1 top-[-10%] left-[10%] w-[36rem] h-[36rem] bg-brand-600/20" />
-      <div className="aurora aurora-anim animate-aurora-2 bottom-[-15%] right-[-8%] w-[34rem] h-[34rem] bg-signal/12" />
-      <div className="aurora aurora-anim top-[30%] right-[25%] w-[20rem] h-[20rem] bg-indigo-500/10 animate-glow-pulse" />
-    </div>
   )
 }

@@ -53,6 +53,8 @@ export default {
         'grid-pan': 'gridPan 30s linear infinite',
         'holo-spin': 'holoSpin 6s linear infinite',
         scanline: 'scanline 2.2s ease-in-out infinite',
+        'scan-sweep': 'scanSweep 3.4s ease-in-out infinite',
+        'row-scan': 'rowScan 3.4s ease-in-out infinite',
       },
       keyframes: {
         float: {
@@ -83,6 +85,14 @@ export default {
           '0%, 100%': { transform: 'translateY(-100%)', opacity: '0' },
           '50%': { opacity: '1' },
           '100%': { transform: 'translateY(100%)', opacity: '0' },
+        },
+        scanSweep: {
+          '0%, 100%': { top: '8%' },
+          '50%': { top: '86%' },
+        },
+        rowScan: {
+          '0%, 100%': { opacity: '0.25' },
+          '46%, 54%': { opacity: '1' },
         },
       },
     },
