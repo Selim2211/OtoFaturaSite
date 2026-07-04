@@ -75,7 +75,7 @@ export default function Hero() {
             variants={fadeUp} custom={2} initial="hidden" animate="visible"
             className="text-lg text-ink-300 leading-relaxed max-w-lg"
           >
-            Akınsoft Wolvox entegreli OtoFatura ile manuel veri girişini tarihe gömün. 50+ kalemlik faturaları yapay zekaya okutun, tek tıkla — hatasız ve eksiksiz — stok deponuza işleyin.
+            Akınsoft Wolvox entegreli OtoFatura ile manuel veri girişini tarihe gömün. 50+ kalemlik faturaları OtoFatura'ya okutun, tek tıkla — hatasız ve eksiksiz — stok deponuza işleyin.
           </motion.p>
 
           <motion.div variants={fadeUp} custom={3} initial="hidden" animate="visible" className="flex flex-wrap gap-x-5 gap-y-2">
