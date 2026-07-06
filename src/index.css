@@ -146,6 +146,45 @@
   }
 }
 
+/* ---- Mobil "Kağıttan Dijitale" hikaye döngüsü (9s) ----
+ * Zaman çizelgesi: 0-22% kağıt durur · 22-46% tarama ışını iner ·
+ * 46-58% kağıt çevrilip yerini dijitale bırakır · 58-86% satırlar
+ * yanar + rozet gelir · 86-100% başa sarım. */
+@keyframes storyPaper {
+  0%, 44%   { opacity: 1; transform: rotateY(0deg); }
+  56%, 88%  { opacity: 0; transform: rotateY(85deg); }
+  96%, 100% { opacity: 1; transform: rotateY(0deg); }
+}
+@keyframes storyDigital {
+  0%, 46%   { opacity: 0; transform: rotateY(-85deg); }
+  58%, 84%  { opacity: 1; transform: rotateY(0deg); }
+  92%, 100% { opacity: 0; transform: rotateY(-85deg); }
+}
+@keyframes storyScan {
+  0%, 20%  { top: 6%; opacity: 0; }
+  25%      { opacity: 1; }
+  44%      { top: 86%; opacity: 1; }
+  48%, 100%{ top: 86%; opacity: 0; }
+}
+@keyframes storyRow {
+  0%, 56%  { opacity: 0.15; }
+  64%, 84% { opacity: 1; }
+  92%, 100%{ opacity: 0.15; }
+}
+@keyframes storyBadge {
+  0%, 66%  { opacity: 0; transform: scale(0.6); }
+  74%, 84% { opacity: 1; transform: scale(1); }
+  92%, 100%{ opacity: 0; transform: scale(0.6); }
+}
+.story-paper   { animation: storyPaper 9s ease-in-out infinite; backface-visibility: hidden; }
+.story-digital { animation: storyDigital 9s ease-in-out infinite; backface-visibility: hidden; }
+.story-scan    { animation: storyScan 9s ease-in-out infinite; }
+.story-row     { animation: storyRow 9s ease-in-out infinite; }
+.story-badge   { animation: storyBadge 9s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+  /* Hareket azaltılmışsa hikaye kartı sabit kağıt halinde kalır — kırık görüntü yok */
+  .story-digital { opacity: 0 !important; }
+  .story-scan, .story-badge { opacity: 0 !important; }
 }

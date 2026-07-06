@@ -1,199 +1,280 @@
 import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Grid, Sparkles, Edges, Html } from '@react-three/drei'
+import { Grid, Sparkles, Edges } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
 const SIGNAL = '#38E1FF'
+const PAPER = '#E7E1CF'
+const PAPER_INK = '#8B8368'
 
-/* Tarama çizgisinin dikey konumu — tek, deterministik zaman fonksiyonu.
- * Hem ışın hem her kart bunu bağımsız hesaplar; ref paylaşımına gerek yok. */
-function scanY(t, speed = 0.55, amp = 0.5) {
-  return Math.sin(t * speed) * amp
-}
-
-/* Kamera açılış hareketi — uzaktan yaklaşan sinematik dolly */
-function IntroDolly() {
-  const start = useRef(null)
-  useFrame((state) => {
-    if (start.current === null) start.current = state.clock.elapsedTime
-    const t = Math.min((state.clock.elapsedTime - start.current) / 1.7, 1)
-    const eased = 1 - Math.pow(1 - t, 3)
-    state.camera.position.z = 13 - eased * 5.5
-    state.camera.fov = 54 - eased * 12
-    state.camera.updateProjectionMatrix()
+/* Scroll ilerlemesini (0..1) yumuşatıp tüm sahneye dağıtan yardımcı.
+ * progressRef: Hero'nun scroll dinleyicisinin yazdığı ham değer.
+ * smooth:      her karede ona doğru yumuşakça yaklaşan değer. */
+function ProgressSmoother({ progressRef, smooth }) {
+  useFrame(() => {
+    const target = progressRef?.current ?? 0
+    smooth.current += (target - smooth.current) * 0.09
   })
   return null
 }
 
-/* OCR tarama ışını — kartların önünden aşağı/yukarı geçen ince ışık çizgisi */
-function ScanBeam({ width }) {
-  const beam = useRef()
-  const glow = useRef()
+/* p'yi [a,b] aralığında 0..1'e sıkıştırır */
+const seg = (p, a, b) => THREE.MathUtils.clamp((p - a) / (b - a), 0, 1)
+const ease = (t) => t * t * (3 - 2 * t) // smoothstep
+
+/* ---------- SAHNE 1: Buruşuk kağıt fatura ---------- */
+function usePaperGeometry() {
+  return useMemo(() => {
+    const g = new THREE.PlaneGeometry(0.95, 1.25, 10, 14)
+    const pos = g.attributes.position
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), y = pos.getY(i)
+      // deterministik "buruşukluk" — hafif dalgalı kağıt yüzeyi
+      const z = Math.sin(x * 9.1 + 1.3) * 0.028 + Math.cos(y * 7.7 + 0.6) * 0.032
+        + Math.sin((x + y) * 12.4) * 0.014
+      pos.setZ(i, z)
+    }
+    g.computeVertexNormals()
+    return g
+  }, [])
+}
+
+function PaperInvoice({ smooth }) {
+  const group = useRef()
+  const mat = useRef()
+  const geo = usePaperGeometry()
+  const rowYs = [0.42, 0.24, 0.06, -0.12, -0.30]
+
   useFrame((state) => {
-    const y = scanY(state.clock.elapsedTime)
-    if (beam.current) beam.current.position.y = y
-    if (glow.current) glow.current.position.y = y
+    const p = smooth.current
+    const t = state.clock.elapsedTime
+    // Kağıt 0–0.45 arasında görünür; 0.45–0.62'de parçacıklara "eriyerek" kaybolur
+    const dissolve = ease(seg(p, 0.42, 0.6))
+    const visible = 1 - dissolve
+    if (group.current) {
+      group.current.visible = visible > 0.01
+      group.current.rotation.y = Math.sin(t * 0.4) * 0.18 * (1 - p)
+      group.current.rotation.x = Math.sin(t * 0.3) * 0.06 * (1 - p)
+      group.current.position.y = Math.sin(t * 0.6) * 0.05 * (1 - p)
+      group.current.scale.setScalar(1 - dissolve * 0.25)
+    }
+    if (mat.current) mat.current.opacity = visible
   })
+
   return (
-    <group>
-      <mesh ref={glow} position={[0, 0, 0.08]}>
-        <planeGeometry args={[width, 0.5]} />
-        <meshBasicMaterial color={SIGNAL} transparent opacity={0.07} />
+    <group ref={group}>
+      <mesh geometry={geo}>
+        <meshStandardMaterial ref={mat} color={PAPER} roughness={0.92} metalness={0} side={THREE.DoubleSide} transparent />
       </mesh>
-      <mesh ref={beam} position={[0, 0, 0.1]}>
-        <planeGeometry args={[width, 0.03]} />
-        <meshStandardMaterial color={SIGNAL} emissive={SIGNAL} emissiveIntensity={2.4} toneMapped={false} />
+      {/* Kağıt üstündeki soluk satırlar */}
+      {rowYs.map((y, i) => (
+        <mesh key={i} position={[-0.04, y, 0.045]}>
+          <planeGeometry args={[i === 0 ? 0.52 : 0.66, 0.05]} />
+          <meshBasicMaterial color={PAPER_INK} transparent opacity={0.55} />
+        </mesh>
+      ))}
+      {/* Köşe kaşesi hissi */}
+      <mesh position={[0.28, -0.48, 0.045]} rotation={[0, 0, -0.2]}>
+        <ringGeometry args={[0.07, 0.09, 24]} />
+        <meshBasicMaterial color="#A44A3F" transparent opacity={0.5} />
       </mesh>
     </group>
   )
 }
 
-/* Işının kart üstünden ekranın köşesine (temsili "Wolvox'a gönderim")
- * süzülen tek seferlik ışık parçacığı — her tarama döngüsünde bir kez tetiklenir. */
-const TRANSFER_TARGET = new THREE.Vector3(3.6, 1.8, 1.3)
-const FLIGHT_DURATION = 0.9
-
-/* Tek fatura kartı — tarama ışını satırların üzerinden geçerken o satır
- * anlık parlıyor (OCR'ın satırı "okuduğu" an). Eşleşen kartlarda tarama
- * alt satırı geçince: yeşil onay rozeti + kısa süreli "%eşleşme" etiketi
- * belirginleşiyor, ardından kart üstünden bir ışık parçacığı hedefe uçuyor. */
-function ScanCard({ index, total }) {
-  const group = useRef()
-  const lineMats = useRef([])
-  const checkMesh = useRef()
-  const badgeDiv = useRef()
-  const sparkMesh = useRef()
-  const flightStart = useRef(null)
-  const startPos = useMemo(() => new THREE.Vector3(), [])
-
-  const cfg = useMemo(() => {
-    const mid = (total - 1) / 2
-    const offset = index - mid
-    return {
-      x: offset * 1.35,
-      z: -Math.abs(offset) * 0.45,
-      rotY: -offset * 0.1,
-      phase: index * 1.7,
-      matched: index % 3 !== 0,
-      pct: 93 + ((index * 37) % 6), // sabit, kart başına deterministik %93-98
+/* ---------- SAHNE 2: Tarama ışını ---------- */
+function ScanBeam({ smooth }) {
+  const beam = useRef()
+  const glow = useRef()
+  useFrame(() => {
+    const p = smooth.current
+    const s = seg(p, 0.2, 0.45)          // ışının aktif olduğu aralık
+    const alive = s > 0 && s < 1
+    const y = THREE.MathUtils.lerp(0.68, -0.68, ease(s))
+    if (beam.current) {
+      beam.current.visible = alive
+      beam.current.position.y = y
     }
-  }, [index, total])
+    if (glow.current) {
+      glow.current.visible = alive
+      glow.current.position.y = y
+    }
+  })
+  return (
+    <group>
+      <mesh ref={glow} position={[0, 0, 0.09]} visible={false}>
+        <planeGeometry args={[1.5, 0.4]} />
+        <meshBasicMaterial color={SIGNAL} transparent opacity={0.08} />
+      </mesh>
+      <mesh ref={beam} position={[0, 0, 0.1]} visible={false}>
+        <planeGeometry args={[1.5, 0.028]} />
+        <meshStandardMaterial color={SIGNAL} emissive={SIGNAL} emissiveIntensity={2.6} toneMapped={false} />
+      </mesh>
+    </group>
+  )
+}
 
-  const lineYs = [0.3, 0.14, -0.02, -0.18]
+/* ---------- SAHNE 3: Parçacık dönüşümü (kağıt → dijital) ---------- */
+function TransformParticles({ smooth, count }) {
+  const meshRef = useRef()
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+  const parts = useMemo(() => (
+    new Array(count).fill(0).map((_, i) => {
+      const rnd = (s) => { // deterministik pseudo-random
+        const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453
+        return x - Math.floor(x)
+      }
+      const px = (rnd(1) - 0.5) * 0.95
+      const py = (rnd(2) - 0.5) * 1.25
+      return {
+        paper: new THREE.Vector3(px, py, 0.03),
+        swirl: new THREE.Vector3((rnd(3) - 0.5) * 3.4, (rnd(4) - 0.5) * 2.2, (rnd(5) - 0.5) * 1.6),
+        card: new THREE.Vector3((rnd(6) - 0.5) * 0.86, (rnd(7) - 0.5) * 1.14, 0.03),
+        delay: rnd(8) * 0.12,
+        size: 0.016 + rnd(9) * 0.02,
+      }
+    })
+  ), [count])
+  const tmp = useMemo(() => new THREE.Vector3(), [])
+
+  useFrame(() => {
+    const p = smooth.current
+    // 0.42–0.62: kağıttan kopup savrulma · 0.62–0.78: karta toplanma
+    const out = ease(seg(p, 0.42, 0.62))
+    const gather = ease(seg(p, 0.6, 0.78))
+    const alive = out > 0.01 && gather < 0.995
+    parts.forEach((pt, i) => {
+      const o = ease(seg(out - pt.delay, 0, 1 - pt.delay))
+      const g = ease(seg(gather - pt.delay, 0, 1 - pt.delay))
+      tmp.lerpVectors(pt.paper, pt.swirl, o)
+      dummy.position.lerpVectors(tmp, pt.card, g)
+      const scale = alive ? pt.size * (0.6 + 0.8 * Math.sin(Math.PI * Math.max(o, g))) : 0
+      dummy.scale.setScalar(Math.max(scale, 0.0001))
+      dummy.updateMatrix()
+      meshRef.current.setMatrixAt(i, dummy.matrix)
+    })
+    meshRef.current.instanceMatrix.needsUpdate = true
+    meshRef.current.visible = alive
+  })
+
+  return (
+    <instancedMesh ref={meshRef} args={[null, null, count]} visible={false}>
+      <sphereGeometry args={[1, 6, 6]} />
+      <meshBasicMaterial color={SIGNAL} toneMapped={false} transparent opacity={0.95} />
+    </instancedMesh>
+  )
+}
+
+/* ---------- SAHNE 4: Dijital fatura kartı + Wolvox kapısına uçuş ---------- */
+const GATE_POS = new THREE.Vector3(2.7, 0.5, -1.4)
+
+function DigitalCard({ smooth }) {
+  const group = useRef()
+  const mats = useRef([])
+  const rowMats = useRef([])
+  const badgeMat = useRef()
+  const rowYs = [0.34, 0.16, -0.02, -0.2]
+  const home = useMemo(() => new THREE.Vector3(0, 0, 0), [])
 
   useFrame((state) => {
+    const p = smooth.current
     const t = state.clock.elapsedTime
-    const bob = Math.sin(t * 0.5 + cfg.phase) * 0.06
-    if (group.current) group.current.position.set(cfg.x, bob, cfg.z)
+    const build = ease(seg(p, 0.66, 0.8))     // kart belirme
+    const fly = ease(seg(p, 0.87, 0.99))      // kapıya uçuş
+    const visible = build > 0.01 && fly < 0.995
 
-    const sY = scanY(t)
-    lineYs.forEach((ly, i) => {
-      const worldLy = bob + ly
-      const dist = Math.abs(sY - worldLy)
-      const heat = Math.max(0, 1 - dist / 0.32)
-      const mat = lineMats.current[i]
-      if (mat) mat.emissiveIntensity = 0.15 + heat * 2.2
+    if (group.current) {
+      group.current.visible = visible
+      group.current.position.lerpVectors(home, GATE_POS, fly)
+      group.current.position.y += Math.sin(t * 0.8) * 0.04 * (1 - fly)
+      group.current.rotation.y = (1 - build) * 0.6 + fly * 0.9
+      group.current.scale.setScalar(build * (1 - fly * 0.75))
+    }
+    mats.current.forEach((m) => { if (m) m.opacity = build * (1 - fly) })
+    rowMats.current.forEach((m, i) => {
+      if (!m) return
+      const rowIn = ease(seg(p, 0.7 + i * 0.025, 0.78 + i * 0.025))
+      m.opacity = rowIn * (1 - fly)
+      m.emissiveIntensity = 0.3 + rowIn * 1.6
     })
-
-    if (!cfg.matched) return
-
-    const passedNow = sY < lineYs[lineYs.length - 1] - 0.08
-    const targetOpacity = passedNow ? 0.95 : 0.12
-
-    if (checkMesh.current) {
-      checkMesh.current.material.opacity = THREE.MathUtils.lerp(checkMesh.current.material.opacity, targetOpacity, 0.05)
-    }
-    if (badgeDiv.current) {
-      const cur = parseFloat(badgeDiv.current.style.opacity || '0')
-      const next = THREE.MathUtils.lerp(cur, passedNow ? 1 : 0, 0.06)
-      badgeDiv.current.style.opacity = next
-      badgeDiv.current.style.transform = `translateY(${(1 - next) * 6}px)`
-    }
-
-    // Uçuş tetikleyici — döngü başına bir kez, geçiş anında
-    if (passedNow && flightStart.current === null) {
-      flightStart.current = t
-      startPos.set(cfg.x, bob + 0.15, cfg.z + 0.05)
-    }
-    if (!passedNow) flightStart.current = null
-
-    if (sparkMesh.current) {
-      if (flightStart.current !== null) {
-        const ft = t - flightStart.current
-        const p = Math.min(ft / FLIGHT_DURATION, 1)
-        const eased = 1 - Math.pow(1 - p, 2)
-        sparkMesh.current.position.lerpVectors(startPos, TRANSFER_TARGET, eased)
-        sparkMesh.current.visible = true
-        sparkMesh.current.material.opacity = p < 0.8 ? 0.9 : THREE.MathUtils.lerp(0.9, 0, (p - 0.8) / 0.2)
-        sparkMesh.current.scale.setScalar(THREE.MathUtils.lerp(1, 0.25, p))
-      } else {
-        sparkMesh.current.visible = false
-      }
+    if (badgeMat.current) {
+      const b = ease(seg(p, 0.8, 0.86))
+      badgeMat.current.opacity = b * (1 - fly)
     }
   })
 
   return (
-    <>
-      <group ref={group} rotation={[0, cfg.rotY, 0]}>
-        <mesh>
-          <boxGeometry args={[0.86, 1.14, 0.03]} />
-          <meshStandardMaterial color="#0C1830" metalness={0.25} roughness={0.3} />
-          <Edges threshold={15} color={SIGNAL} />
+    <group ref={group} visible={false}>
+      <mesh>
+        <boxGeometry args={[0.88, 1.16, 0.03]} />
+        <meshStandardMaterial
+          ref={(m) => { mats.current[0] = m }}
+          color="#0C1830" metalness={0.3} roughness={0.25} transparent
+        />
+        <Edges threshold={15} color={SIGNAL} />
+      </mesh>
+      {rowYs.map((y, i) => (
+        <mesh key={i} position={[-0.05, y, 0.021]}>
+          <planeGeometry args={[i === 0 ? 0.5 : 0.6, 0.048]} />
+          <meshStandardMaterial
+            ref={(m) => { rowMats.current[i] = m }}
+            color={i === 0 ? SIGNAL : '#3A5580'}
+            emissive={SIGNAL} emissiveIntensity={0.3}
+            transparent opacity={0} toneMapped={false}
+          />
         </mesh>
-        {lineYs.map((ly, i) => (
-          <mesh key={i} position={[-0.05, ly, 0.021]}>
-            <planeGeometry args={[i === 0 ? 0.5 : 0.58, 0.045]} />
-            <meshStandardMaterial
-              ref={(m) => { lineMats.current[i] = m }}
-              color={i === 0 ? SIGNAL : '#3A5580'}
-              emissive={SIGNAL}
-              emissiveIntensity={0.15}
-              toneMapped={false}
-            />
-          </mesh>
-        ))}
-        {cfg.matched && (
-          <>
-            <mesh ref={checkMesh} position={[0.33, 0.42, 0.022]}>
-              <circleGeometry args={[0.075, 20]} />
-              <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={1.2} transparent opacity={0.12} toneMapped={false} />
-            </mesh>
-            <Html position={[0.02, 0.56, 0.05]} center distanceFactor={6} style={{ pointerEvents: 'none' }}>
-              <div
-                ref={badgeDiv}
-                className="font-data whitespace-nowrap rounded border border-emerald-500/40 bg-void/85 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300"
-                style={{ opacity: 0 }}
-              >
-                %{cfg.pct} eşleşti
-              </div>
-            </Html>
-          </>
-        )}
-      </group>
-      {cfg.matched && (
-        <mesh ref={sparkMesh} visible={false}>
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshBasicMaterial color={SIGNAL} transparent opacity={0} toneMapped={false} />
-        </mesh>
-      )}
-    </>
+      ))}
+      <mesh position={[0.32, 0.44, 0.022]}>
+        <circleGeometry args={[0.08, 20]} />
+        <meshStandardMaterial
+          ref={badgeMat}
+          color="#10B981" emissive="#10B981" emissiveIntensity={1.4}
+          transparent opacity={0} toneMapped={false}
+        />
+      </mesh>
+    </group>
   )
 }
 
-function CardsArc({ count }) {
-  return new Array(count).fill(0).map((_, i) => <ScanCard key={i} index={i} total={count} />)
+/* Wolvox'u temsil eden ışık kapısı */
+function Gate({ smooth }) {
+  const group = useRef()
+  const ring = useRef()
+  const flash = useRef()
+  useFrame((state) => {
+    const p = smooth.current
+    const t = state.clock.elapsedTime
+    const appear = ease(seg(p, 0.72, 0.85))
+    const arrived = ease(seg(p, 0.95, 1))
+    if (group.current) {
+      group.current.visible = appear > 0.01
+      group.current.scale.setScalar(appear * (1 + arrived * 0.15))
+      group.current.rotation.z = t * 0.4
+    }
+    if (ring.current) ring.current.emissiveIntensity = 1.4 + Math.sin(t * 3) * 0.4 + arrived * 2.5
+    if (flash.current) flash.current.opacity = arrived * 0.6
+  })
+  return (
+    <group ref={group} position={GATE_POS.toArray()} visible={false}>
+      <mesh>
+        <torusGeometry args={[0.42, 0.03, 16, 64]} />
+        <meshStandardMaterial ref={ring} color={SIGNAL} emissive={SIGNAL} emissiveIntensity={1.4} toneMapped={false} />
+      </mesh>
+      <mesh>
+        <circleGeometry args={[0.38, 32]} />
+        <meshBasicMaterial ref={flash} color="#BFF6FF" transparent opacity={0} toneMapped={false} />
+      </mesh>
+    </group>
+  )
 }
 
-/* Mouse parallax + çok hafif sallanma (tam dönüş yok — sabit duran bir belge kümesi) */
+/* Mouse parallax */
 function Rig({ children }) {
   const group = useRef()
   useFrame((state) => {
-    if (group.current) {
-      group.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.15) * 0.12
-    }
-    const px = state.pointer.x * 1.0
-    const py = state.pointer.y * 0.5
+    const px = state.pointer.x * 0.9
+    const py = state.pointer.y * 0.45
     state.camera.position.x += (px - state.camera.position.x) * 0.04
     state.camera.position.y += (py - state.camera.position.y) * 0.04
     state.camera.lookAt(0, 0, 0)
@@ -201,43 +282,47 @@ function Rig({ children }) {
   return <group ref={group}>{children}</group>
 }
 
-export default function Scene3D({ quality = 'medium', active = true }) {
+export default function Scene3D({ quality = 'medium', active = true, progressRef }) {
   const high = quality === 'high'
-  const count = high ? 7 : 5
-  const beamWidth = (count - 1) * 1.35 + 1.3
+  const smooth = useRef(0)
 
   return (
     <Canvas
       dpr={high ? [1, 1.6] : [1, 1.15]}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      camera={{ position: [0, 0, 7.5], fov: 42 }}
+      camera={{ position: [0.6, 0.1, 4.6], fov: 42 }}
       frameloop={active ? 'always' : 'never'}
     >
       <color attach="background" args={['#050B18']} />
-      <fog attach="fog" args={['#050B18', 8, 18]} />
+      <fog attach="fog" args={['#050B18', 7, 16]} />
 
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[4, 6, 6]} intensity={0.6} color="#DCEBFF" />
-      <pointLight position={[0, 2, 4]} intensity={0.8} color={SIGNAL} />
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[3, 5, 5]} intensity={0.9} color="#EAF2FF" />
+      <pointLight position={[-4, 1, 3]} intensity={0.7} color={SIGNAL} />
 
-      <IntroDolly />
+      <ProgressSmoother progressRef={progressRef} smooth={smooth} />
 
       <Rig>
-        <CardsArc count={count} />
-        <ScanBeam width={beamWidth} />
-        <Sparkles count={high ? 40 : 22} scale={9} size={1.8} speed={0.25} color={SIGNAL} opacity={0.35} />
+        <group position={[0.9, 0.1, 0]}>
+          <PaperInvoice smooth={smooth} />
+          <ScanBeam smooth={smooth} />
+          <TransformParticles smooth={smooth} count={high ? 320 : 180} />
+          <DigitalCard smooth={smooth} />
+        </group>
+        <Gate smooth={smooth} />
+        <Sparkles count={high ? 40 : 22} scale={8} size={1.8} speed={0.25} color={SIGNAL} opacity={0.32} />
       </Rig>
 
       <Grid
-        position={[0, -2.2, 0]}
-        args={[30, 30]}
-        cellSize={0.6}
+        position={[0, -1.9, 0]}
+        args={[26, 26]}
+        cellSize={0.55}
         cellThickness={0.5}
         cellColor="#122A4D"
-        sectionSize={3}
+        sectionSize={2.75}
         sectionThickness={1}
         sectionColor="#1B4A80"
-        fadeDistance={16}
+        fadeDistance={13}
         fadeStrength={1.6}
       />
 
