@@ -1,6 +1,6 @@
 import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Grid, Sparkles, Edges } from '@react-three/drei'
+import { Grid, Sparkles, Edges, Html } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
@@ -8,13 +8,22 @@ const SIGNAL = '#38E1FF'
 const PAPER = '#E7E1CF'
 const PAPER_INK = '#8B8368'
 
-/* Scroll ilerlemesini (0..1) yumuşatıp tüm sahneye dağıtan yardımcı.
- * progressRef: Hero'nun scroll dinleyicisinin yazdığı ham değer.
- * smooth:      her karede ona doğru yumuşakça yaklaşan değer. */
-function ProgressSmoother({ progressRef, smooth }) {
-  useFrame(() => {
-    const target = progressRef?.current ?? 0
-    smooth.current += (target - smooth.current) * 0.09
+/* Hikaye kendi kendine döner — 14 saniyelik sonsuz döngü.
+ * smooth.current her karede 0..1 arası döngü ilerlemesini taşır;
+ * aşama değişince onStage ile Hero'daki etiket güncellenir. */
+const CYCLE = 14
+const stageOf = (p) => (p < 0.2 ? 0 : p < 0.55 ? 1 : p < 0.85 ? 2 : 3)
+
+function StoryLoop({ smooth, onStage }) {
+  const lastStage = useRef(-1)
+  useFrame((state) => {
+    const p = (state.clock.elapsedTime % CYCLE) / CYCLE
+    smooth.current = p
+    const s = stageOf(p)
+    if (s !== lastStage.current) {
+      lastStage.current = s
+      onStage?.(s)
+    }
   })
   return null
 }
@@ -49,9 +58,10 @@ function PaperInvoice({ smooth }) {
   useFrame((state) => {
     const p = smooth.current
     const t = state.clock.elapsedTime
-    // Kağıt 0–0.45 arasında görünür; 0.45–0.62'de parçacıklara "eriyerek" kaybolur
+    // Döngü başında yumuşak beliriş; 0.42–0.6'da parçacıklara "eriyerek" kaybolur
+    const fadeIn = ease(seg(p, 0, 0.05))
     const dissolve = ease(seg(p, 0.42, 0.6))
-    const visible = 1 - dissolve
+    const visible = fadeIn * (1 - dissolve)
     if (group.current) {
       group.current.visible = visible > 0.01
       group.current.rotation.y = Math.sin(t * 0.4) * 0.18 * (1 - p)
@@ -237,34 +247,59 @@ function DigitalCard({ smooth }) {
   )
 }
 
-/* Wolvox'u temsil eden ışık kapısı */
+/* Wolvox'u temsil eden ışık kapısı + "AKTARIM BAŞARILI" onayı */
 function Gate({ smooth }) {
   const group = useRef()
   const ring = useRef()
   const flash = useRef()
+  const label = useRef()
   useFrame((state) => {
     const p = smooth.current
     const t = state.clock.elapsedTime
     const appear = ease(seg(p, 0.72, 0.85))
-    const arrived = ease(seg(p, 0.95, 1))
+    const arrived = ease(seg(p, 0.93, 0.985))
     if (group.current) {
       group.current.visible = appear > 0.01
       group.current.scale.setScalar(appear * (1 + arrived * 0.15))
-      group.current.rotation.z = t * 0.4
     }
-    if (ring.current) ring.current.emissiveIntensity = 1.4 + Math.sin(t * 3) * 0.4 + arrived * 2.5
+    if (ring.current) {
+      ring.current.parent.rotation.z = t * 0.4
+      ring.current.emissiveIntensity = 1.4 + Math.sin(t * 3) * 0.4 + arrived * 2.5
+    }
     if (flash.current) flash.current.opacity = arrived * 0.6
+    if (label.current) {
+      label.current.style.opacity = arrived
+      label.current.style.transform = `translateY(${(1 - arrived) * 10}px) scale(${0.85 + arrived * 0.15})`
+    }
   })
   return (
     <group ref={group} position={GATE_POS.toArray()} visible={false}>
-      <mesh>
-        <torusGeometry args={[0.42, 0.03, 16, 64]} />
-        <meshStandardMaterial ref={ring} color={SIGNAL} emissive={SIGNAL} emissiveIntensity={1.4} toneMapped={false} />
-      </mesh>
+      <group>
+        <mesh>
+          <torusGeometry args={[0.42, 0.03, 16, 64]} />
+          <meshStandardMaterial ref={ring} color={SIGNAL} emissive={SIGNAL} emissiveIntensity={1.4} toneMapped={false} />
+        </mesh>
+      </group>
       <mesh>
         <circleGeometry args={[0.38, 32]} />
         <meshBasicMaterial ref={flash} color="#BFF6FF" transparent opacity={0} toneMapped={false} />
       </mesh>
+      {/* Onay yazısı — halkanın altında belirir */}
+      <Html position={[0, -0.78, 0]} center distanceFactor={5.5} style={{ pointerEvents: 'none' }}>
+        <div
+          ref={label}
+          style={{ opacity: 0 }}
+          className="flex items-center gap-2 whitespace-nowrap rounded-full border border-emerald-400/50 bg-[#050B18]/90 px-4 py-1.5 shadow-[0_0_24px_rgba(16,185,129,0.35)]"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="11" stroke="#34D399" strokeWidth="2" />
+            <path d="M7 12.5l3.2 3.2L17 9" stroke="#34D399" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="font-data text-[13px] font-bold uppercase tracking-[0.18em] text-emerald-300">
+            Aktarım Başarılı
+          </span>
+        </div>
+      </Html>
     </group>
   )
 }
@@ -282,7 +317,7 @@ function Rig({ children }) {
   return <group ref={group}>{children}</group>
 }
 
-export default function Scene3D({ quality = 'medium', active = true, progressRef }) {
+export default function Scene3D({ quality = 'medium', active = true, onStage }) {
   const high = quality === 'high'
   const smooth = useRef(0)
 
@@ -300,7 +335,7 @@ export default function Scene3D({ quality = 'medium', active = true, progressRef
       <directionalLight position={[3, 5, 5]} intensity={0.9} color="#EAF2FF" />
       <pointLight position={[-4, 1, 3]} intensity={0.7} color={SIGNAL} />
 
-      <ProgressSmoother progressRef={progressRef} smooth={smooth} />
+      <StoryLoop smooth={smooth} onStage={onStage} />
 
       <Rig>
         <group position={[0.9, 0.1, 0]}>
