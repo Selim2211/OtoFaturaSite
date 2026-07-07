@@ -250,7 +250,8 @@ function DigitalCard({ smooth }) {
 /* Wolvox'u temsil eden ışık kapısı + "AKTARIM BAŞARILI" onayı */
 function Gate({ smooth }) {
   const group = useRef()
-  const ring = useRef()
+  const ringGroup = useRef()   // dönen halka grubu (Object3D)
+  const ringMat = useRef()     // halka materyali (emissive)
   const flash = useRef()
   const label = useRef()
   useFrame((state) => {
@@ -262,10 +263,8 @@ function Gate({ smooth }) {
       group.current.visible = appear > 0.01
       group.current.scale.setScalar(appear * (1 + arrived * 0.15))
     }
-    if (ring.current) {
-      ring.current.parent.rotation.z = t * 0.4
-      ring.current.emissiveIntensity = 1.4 + Math.sin(t * 3) * 0.4 + arrived * 2.5
-    }
+    if (ringGroup.current) ringGroup.current.rotation.z = t * 0.4
+    if (ringMat.current) ringMat.current.emissiveIntensity = 1.4 + Math.sin(t * 3) * 0.4 + arrived * 2.5
     if (flash.current) flash.current.opacity = arrived * 0.6
     if (label.current) {
       label.current.style.opacity = arrived
@@ -274,10 +273,10 @@ function Gate({ smooth }) {
   })
   return (
     <group ref={group} position={GATE_POS.toArray()} visible={false}>
-      <group>
+      <group ref={ringGroup}>
         <mesh>
           <torusGeometry args={[0.42, 0.03, 16, 64]} />
-          <meshStandardMaterial ref={ring} color={SIGNAL} emissive={SIGNAL} emissiveIntensity={1.4} toneMapped={false} />
+          <meshStandardMaterial ref={ringMat} color={SIGNAL} emissive={SIGNAL} emissiveIntensity={1.4} toneMapped={false} />
         </mesh>
       </group>
       <mesh>
