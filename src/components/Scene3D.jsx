@@ -1,12 +1,11 @@
 import { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Grid, Sparkles, Edges, Html } from '@react-three/drei'
+import { Grid, Sparkles, Edges, Html, useTexture } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
 const SIGNAL = '#38E1FF'
 const PAPER = '#E7E1CF'
-const PAPER_INK = '#8B8368'
 
 /* Hikaye kendi kendine döner — 14 saniyelik sonsuz döngü.
  * smooth.current her karede 0..1 arası döngü ilerlemesini taşır;
@@ -49,11 +48,19 @@ function usePaperGeometry() {
   }, [])
 }
 
+const PAPER_ACCENT = '#2B4C74'   // başlık/toplam vurgusu (kurumsal lacivert)
+const PAPER_ROW = '#6E6A57'      // kalem satırları
+const PAPER_FAINT = '#B4AC92'    // ince ayraç/soluk çizgi
+
 function PaperInvoice({ smooth }) {
   const group = useRef()
   const mat = useRef()
   const geo = usePaperGeometry()
-  const rowYs = [0.42, 0.24, 0.06, -0.12, -0.30]
+  // Fatura kalemleri: [açıklama genişliği, fiyat genişliği]
+  const items = [
+    [0.40, 0.12], [0.46, 0.10], [0.34, 0.13], [0.42, 0.11],
+  ]
+  const itemY = (i) => 0.16 - i * 0.135
 
   useFrame((state) => {
     const p = smooth.current
@@ -72,21 +79,90 @@ function PaperInvoice({ smooth }) {
     if (mat.current) mat.current.opacity = visible
   })
 
+  const Z = 0.045
   return (
     <group ref={group}>
+      {/* Kağıt gövdesi (hafif buruşuk) */}
       <mesh geometry={geo}>
         <meshStandardMaterial ref={mat} color={PAPER} roughness={0.92} metalness={0} side={THREE.DoubleSide} transparent />
       </mesh>
-      {/* Kağıt üstündeki soluk satırlar */}
-      {rowYs.map((y, i) => (
-        <mesh key={i} position={[-0.04, y, 0.045]}>
-          <planeGeometry args={[i === 0 ? 0.52 : 0.66, 0.05]} />
-          <meshBasicMaterial color={PAPER_INK} transparent opacity={0.55} />
-        </mesh>
+
+      {/* Üst başlık şeridi */}
+      <mesh position={[0, 0.5, Z]}>
+        <planeGeometry args={[0.82, 0.16]} />
+        <meshBasicMaterial color={PAPER_ACCENT} transparent opacity={0.9} />
+      </mesh>
+      {/* Başlıktaki logo karesi */}
+      <mesh position={[-0.28, 0.5, Z + 0.001]}>
+        <planeGeometry args={[0.1, 0.1]} />
+        <meshBasicMaterial color="#EAF2FF" transparent opacity={0.85} />
+      </mesh>
+      {/* Başlık yazı satırları (açık) */}
+      <mesh position={[0.04, 0.53, Z + 0.001]}>
+        <planeGeometry args={[0.4, 0.028]} />
+        <meshBasicMaterial color="#DCE6F5" transparent opacity={0.85} />
+      </mesh>
+      <mesh position={[0.0, 0.47, Z + 0.001]}>
+        <planeGeometry args={[0.32, 0.022]} />
+        <meshBasicMaterial color="#B9C9E2" transparent opacity={0.7} />
+      </mesh>
+
+      {/* Fatura no / tarih bloğu (sağ üst, başlık altında) */}
+      <mesh position={[0.2, 0.34, Z]}>
+        <planeGeometry args={[0.24, 0.02]} />
+        <meshBasicMaterial color={PAPER_ROW} transparent opacity={0.5} />
+      </mesh>
+      <mesh position={[0.24, 0.30, Z]}>
+        <planeGeometry args={[0.16, 0.02]} />
+        <meshBasicMaterial color={PAPER_ROW} transparent opacity={0.4} />
+      </mesh>
+
+      {/* Sütun başlığı ayraç çizgisi */}
+      <mesh position={[0, 0.25, Z]}>
+        <planeGeometry args={[0.82, 0.008]} />
+        <meshBasicMaterial color={PAPER_ACCENT} transparent opacity={0.55} />
+      </mesh>
+
+      {/* Kalem satırları: solda açıklama, sağda fiyat */}
+      {items.map(([desc, price], i) => (
+        <group key={i} position={[0, itemY(i), Z]}>
+          <mesh position={[-0.41 + desc / 2 + 0.02, 0, 0]}>
+            <planeGeometry args={[desc, 0.035]} />
+            <meshBasicMaterial color={PAPER_ROW} transparent opacity={0.6} />
+          </mesh>
+          <mesh position={[0.39 - price / 2, 0, 0]}>
+            <planeGeometry args={[price, 0.035]} />
+            <meshBasicMaterial color={PAPER_ROW} transparent opacity={0.45} />
+          </mesh>
+          {/* ince satır ayracı */}
+          <mesh position={[0, -0.055, 0]}>
+            <planeGeometry args={[0.82, 0.004]} />
+            <meshBasicMaterial color={PAPER_FAINT} transparent opacity={0.5} />
+          </mesh>
+        </group>
       ))}
-      {/* Köşe kaşesi hissi */}
-      <mesh position={[0.28, -0.48, 0.045]} rotation={[0, 0, -0.2]}>
-        <ringGeometry args={[0.07, 0.09, 24]} />
+
+      {/* TOPLAM vurgu kutusu (sağ alt) */}
+      <mesh position={[0.22, -0.4, Z]}>
+        <planeGeometry args={[0.36, 0.11]} />
+        <meshBasicMaterial color={PAPER_ACCENT} transparent opacity={0.85} />
+      </mesh>
+      <mesh position={[0.1, -0.4, Z + 0.001]}>
+        <planeGeometry args={[0.1, 0.028]} />
+        <meshBasicMaterial color="#DCE6F5" transparent opacity={0.85} />
+      </mesh>
+      <mesh position={[0.29, -0.4, Z + 0.001]}>
+        <planeGeometry args={[0.14, 0.032]} />
+        <meshBasicMaterial color="#FFFFFF" transparent opacity={0.9} />
+      </mesh>
+
+      {/* Köşe kaşesi (sol alt) */}
+      <mesh position={[-0.26, -0.42, Z]} rotation={[0, 0, -0.22]}>
+        <ringGeometry args={[0.07, 0.092, 28]} />
+        <meshBasicMaterial color="#A44A3F" transparent opacity={0.55} />
+      </mesh>
+      <mesh position={[-0.26, -0.42, Z]} rotation={[0, 0, -0.22]}>
+        <planeGeometry args={[0.11, 0.022]} />
         <meshBasicMaterial color="#A44A3F" transparent opacity={0.5} />
       </mesh>
     </group>
@@ -248,13 +324,30 @@ function DigitalCard({ smooth }) {
 }
 
 /* Wolvox'u temsil eden ışık kapısı + "AKTARIM BAŞARILI" onayı */
+const LOGO_BLUE = '#1b4d8e'          // logonun zemin mavisi — disk aynı renk, dikiş görünmez
+const LOGO_ASPECT = 376 / 690        // wolwoxlogo.png en-boy oranı
+
 function Gate({ smooth }) {
   const group = useRef()
   const ringGroup = useRef()   // dönen halka grubu (Object3D)
   const ringMat = useRef()     // halka materyali (emissive)
   const flash = useRef()
   const label = useRef()
-  const logo = useRef()        // Wolvox ERP logo rozeti (Html)
+  const discMat = useRef()     // mavi rozet diski
+  const glossMat = useRef()    // üst cam parlaması
+  const logoMat = useRef()     // logo düzlemi materyali
+
+  // Logo dokusu — keskin görünsün diye anisotropy + sRGB
+  const tex = useTexture('/wolwoxlogo.png')
+  useMemo(() => {
+    tex.colorSpace = THREE.SRGBColorSpace
+    tex.anisotropy = 16
+    tex.minFilter = THREE.LinearMipmapLinearFilter
+    tex.magFilter = THREE.LinearFilter
+    tex.generateMipmaps = true
+    tex.needsUpdate = true
+  }, [tex])
+
   useFrame((state) => {
     const p = smooth.current
     const t = state.clock.elapsedTime
@@ -266,37 +359,43 @@ function Gate({ smooth }) {
     }
     if (ringGroup.current) ringGroup.current.rotation.z = t * 0.4
     if (ringMat.current) ringMat.current.emissiveIntensity = 1.4 + Math.sin(t * 3) * 0.4 + arrived * 2.5
+    if (discMat.current) discMat.current.opacity = appear
+    if (glossMat.current) glossMat.current.opacity = appear * 0.4
+    if (logoMat.current) logoMat.current.opacity = appear
     if (flash.current) flash.current.opacity = arrived * 0.6
-    if (logo.current) {
-      logo.current.style.opacity = appear
-      logo.current.style.transform = `scale(${0.7 + appear * 0.3 + arrived * 0.06})`
-    }
     if (label.current) {
       label.current.style.opacity = arrived
       label.current.style.transform = `translateY(${(1 - arrived) * 10}px) scale(${0.85 + arrived * 0.15})`
     }
   })
+
+  const logoW = 0.62
   return (
     <group ref={group} position={GATE_POS.toArray()} visible={false}>
+      {/* Neon dış halka (döner) */}
       <group ref={ringGroup}>
         <mesh>
-          <torusGeometry args={[0.42, 0.03, 16, 64]} />
+          <torusGeometry args={[0.44, 0.028, 20, 96]} />
           <meshStandardMaterial ref={ringMat} color={SIGNAL} emissive={SIGNAL} emissiveIntensity={1.4} toneMapped={false} />
         </mesh>
       </group>
-      {/* Wolvox ERP logolu yuvarlak rozet — halkanın içine oturur */}
-      <Html position={[0, 0, 0.02]} center distanceFactor={4.4} style={{ pointerEvents: 'none' }} zIndexRange={[5, 0]}>
-        <div
-          ref={logo}
-          style={{ opacity: 0 }}
-          className="relative h-[104px] w-[104px] overflow-hidden rounded-full border border-signal/60 bg-[#1c4e8f] shadow-[0_0_26px_4px_rgba(56,225,255,0.5),inset_0_2px_10px_rgba(255,255,255,0.2),inset_0_-8px_16px_rgba(0,0,0,0.35)]"
-        >
-          <img src="/wolwoxlogo.png" alt="Wolvox ERP" className="absolute inset-0 h-full w-full object-contain p-2" draggable="false" />
-          <span className="absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/25 to-transparent" />
-        </div>
-      </Html>
+      {/* Mavi rozet diski — halkayı doldurur (logo ile aynı renk/ışık → dikiş yok) */}
+      <mesh position={[0, 0, -0.01]}>
+        <circleGeometry args={[0.41, 64]} />
+        <meshBasicMaterial ref={discMat} color={LOGO_BLUE} transparent opacity={0} toneMapped={false} />
+      </mesh>
+      {/* Üstten cam parlaması */}
+      <mesh position={[0, 0.14, 0.005]}>
+        <circleGeometry args={[0.34, 48, 0, Math.PI]} />
+        <meshBasicMaterial ref={glossMat} color="#BFE6FF" transparent opacity={0} toneMapped={false} />
+      </mesh>
+      {/* Wolvox ERP logosu — native oranında, bozulmasız (contain) */}
+      <mesh position={[0, 0, 0.012]}>
+        <planeGeometry args={[logoW, logoW * LOGO_ASPECT]} />
+        <meshBasicMaterial ref={logoMat} map={tex} transparent opacity={0} toneMapped={false} />
+      </mesh>
       <mesh>
-        <circleGeometry args={[0.38, 32]} />
+        <circleGeometry args={[0.4, 48]} />
         <meshBasicMaterial ref={flash} color="#BFF6FF" transparent opacity={0} toneMapped={false} />
       </mesh>
       {/* Onay yazısı — halkanın altında belirir */}
