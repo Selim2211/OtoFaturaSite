@@ -254,6 +254,7 @@ function Gate({ smooth }) {
   const ringMat = useRef()     // halka materyali (emissive)
   const flash = useRef()
   const label = useRef()
+  const logo = useRef()        // Wolvox ERP logo rozeti (Html)
   useFrame((state) => {
     const p = smooth.current
     const t = state.clock.elapsedTime
@@ -266,6 +267,10 @@ function Gate({ smooth }) {
     if (ringGroup.current) ringGroup.current.rotation.z = t * 0.4
     if (ringMat.current) ringMat.current.emissiveIntensity = 1.4 + Math.sin(t * 3) * 0.4 + arrived * 2.5
     if (flash.current) flash.current.opacity = arrived * 0.6
+    if (logo.current) {
+      logo.current.style.opacity = appear
+      logo.current.style.transform = `scale(${0.7 + appear * 0.3 + arrived * 0.06})`
+    }
     if (label.current) {
       label.current.style.opacity = arrived
       label.current.style.transform = `translateY(${(1 - arrived) * 10}px) scale(${0.85 + arrived * 0.15})`
@@ -279,6 +284,17 @@ function Gate({ smooth }) {
           <meshStandardMaterial ref={ringMat} color={SIGNAL} emissive={SIGNAL} emissiveIntensity={1.4} toneMapped={false} />
         </mesh>
       </group>
+      {/* Wolvox ERP logolu yuvarlak rozet — halkanın içine oturur */}
+      <Html position={[0, 0, 0.02]} center distanceFactor={4.4} style={{ pointerEvents: 'none' }} zIndexRange={[5, 0]}>
+        <div
+          ref={logo}
+          style={{ opacity: 0 }}
+          className="relative h-[104px] w-[104px] overflow-hidden rounded-full border border-signal/60 bg-[#1c4e8f] shadow-[0_0_26px_4px_rgba(56,225,255,0.5),inset_0_2px_10px_rgba(255,255,255,0.2),inset_0_-8px_16px_rgba(0,0,0,0.35)]"
+        >
+          <img src="/wolwoxlogo.png" alt="Wolvox ERP" className="absolute inset-0 h-full w-full object-contain p-2" draggable="false" />
+          <span className="absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/25 to-transparent" />
+        </div>
+      </Html>
       <mesh>
         <circleGeometry args={[0.38, 32]} />
         <meshBasicMaterial ref={flash} color="#BFF6FF" transparent opacity={0} toneMapped={false} />
