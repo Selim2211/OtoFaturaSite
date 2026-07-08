@@ -201,53 +201,83 @@ function ScanBeam({ smooth }) {
   )
 }
 
-/* ---------- SAHNE 3: Parçacık dönüşümü (kağıt → dijital) ---------- */
+/* ---------- SAHNE 3: KAĞIT PARÇALANMASI → DİJİTAL ----------
+ * Kağıt, ızgara hücrelerine bölünür; her hücre bir "shard" (kağıt parçası).
+ * 0.42–0.62: parçalar kağıttan KOPAR, takla atarak savrulur (gerçek parçalanma).
+ * 0.60–0.78: parçalar kartın yüzeyine toplanır ve rengi kağıttan CYAN'a döner
+ * (kağıt → dijital bit). instanceColor ile parça parça renk geçişi. */
 function TransformParticles({ smooth, count }) {
   const meshRef = useRef()
   const dummy = useMemo(() => new THREE.Object3D(), [])
-  const parts = useMemo(() => (
-    new Array(count).fill(0).map((_, i) => {
-      const rnd = (s) => { // deterministik pseudo-random
-        const x = Math.sin(i * 127.1 + s * 311.7) * 43758.5453
-        return x - Math.floor(x)
+  const cPaper = useMemo(() => new THREE.Color(PAPER), [])
+  const cSignal = useMemo(() => new THREE.Color(SIGNAL), [])
+  const cTmp = useMemo(() => new THREE.Color(), [])
+
+  // Kağıdı düzgün ızgaraya böl → parçalar kağıdın tamamını kaplar (gerçek kırılma)
+  const parts = useMemo(() => {
+    const cols = Math.max(4, Math.round(Math.sqrt(count * 0.76)))
+    const rows = Math.ceil(count / cols)
+    const W = 0.95, H = 1.25
+    const arr = []
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const idx = r * cols + c
+        if (idx >= count) break
+        const rnd = (s) => {
+          const x = Math.sin(idx * 127.1 + s * 311.7) * 43758.5453
+          return x - Math.floor(x)
+        }
+        // hücre merkezi = parçanın kağıttaki gerçek yeri
+        const px = -W / 2 + (c + 0.5) * (W / cols)
+        const py = -H / 2 + (r + 0.5) * (H / rows)
+        arr.push({
+          paper: new THREE.Vector3(px, py, 0.03),
+          // patlama yönü merkezden dışa + rastgele derinlik
+          swirl: new THREE.Vector3(px * 2.6 + (rnd(3) - 0.5) * 1.6, py * 2.2 + (rnd(4) - 0.5) * 1.4, (rnd(5) - 0.5) * 1.8),
+          card: new THREE.Vector3((rnd(6) - 0.5) * 0.82, (rnd(7) - 0.5) * 1.08, 0.02),
+          spin: new THREE.Vector3((rnd(8) - 0.5) * 14, (rnd(9) - 0.5) * 14, (rnd(1) - 0.5) * 14),
+          delay: rnd(2) * 0.14,
+          size: (0.9 + rnd(9) * 0.5) * (Math.min(W / cols, H / rows) * 0.92),
+        })
       }
-      const px = (rnd(1) - 0.5) * 0.95
-      const py = (rnd(2) - 0.5) * 1.25
-      return {
-        paper: new THREE.Vector3(px, py, 0.03),
-        swirl: new THREE.Vector3((rnd(3) - 0.5) * 3.4, (rnd(4) - 0.5) * 2.2, (rnd(5) - 0.5) * 1.6),
-        card: new THREE.Vector3((rnd(6) - 0.5) * 0.86, (rnd(7) - 0.5) * 1.14, 0.03),
-        delay: rnd(8) * 0.12,
-        size: 0.016 + rnd(9) * 0.02,
-      }
-    })
-  ), [count])
+    }
+    return arr
+  }, [count])
   const tmp = useMemo(() => new THREE.Vector3(), [])
 
-  useFrame(() => {
+  useFrame((state) => {
     const p = smooth.current
-    // 0.42–0.62: kağıttan kopup savrulma · 0.62–0.78: karta toplanma
-    const out = ease(seg(p, 0.42, 0.62))
-    const gather = ease(seg(p, 0.6, 0.78))
+    const t = state.clock.elapsedTime
+    const out = ease(seg(p, 0.42, 0.62))     // kopma/savrulma
+    const gather = ease(seg(p, 0.6, 0.78))   // karta toplanma
     const alive = out > 0.01 && gather < 0.995
+    if (!alive) { meshRef.current.visible = false; return }
+    meshRef.current.visible = true
     parts.forEach((pt, i) => {
       const o = ease(seg(out - pt.delay, 0, 1 - pt.delay))
       const g = ease(seg(gather - pt.delay, 0, 1 - pt.delay))
       tmp.lerpVectors(pt.paper, pt.swirl, o)
       dummy.position.lerpVectors(tmp, pt.card, g)
-      const scale = alive ? pt.size * (0.6 + 0.8 * Math.sin(Math.PI * Math.max(o, g))) : 0
+      // takla: kopunca hızlı döner, toplanınca hizalanır
+      const tumble = (o - g) * 1
+      dummy.rotation.set(pt.spin.x * tumble + t * 0.2, pt.spin.y * tumble, pt.spin.z * tumble)
+      // toplanırken küçülüp bit'e dönüşür
+      const scale = pt.size * (1 - g * 0.55) * (o < 1 ? 0.35 + 0.65 * o : 1)
       dummy.scale.setScalar(Math.max(scale, 0.0001))
       dummy.updateMatrix()
       meshRef.current.setMatrixAt(i, dummy.matrix)
+      // renk: kağıt → cyan (toplanma ilerledikçe)
+      cTmp.copy(cPaper).lerp(cSignal, ease(g))
+      meshRef.current.setColorAt(i, cTmp)
     })
     meshRef.current.instanceMatrix.needsUpdate = true
-    meshRef.current.visible = alive
+    if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true
   })
 
   return (
     <instancedMesh ref={meshRef} args={[null, null, count]} visible={false}>
-      <sphereGeometry args={[1, 6, 6]} />
-      <meshBasicMaterial color={SIGNAL} toneMapped={false} transparent opacity={0.95} />
+      <planeGeometry args={[1, 1]} />
+      <meshBasicMaterial color={PAPER} toneMapped={false} transparent opacity={0.98} side={THREE.DoubleSide} />
     </instancedMesh>
   )
 }
@@ -325,7 +355,7 @@ function DigitalCard({ smooth }) {
 
 /* Wolvox'u temsil eden ışık kapısı + "AKTARIM BAŞARILI" onayı */
 const LOGO_BLUE = '#0b4d8e'          // logonun zemin mavisi (pikselden ölçüldü) — disk aynı renk
-const LOGO_ASPECT = 386 / 682        // wolwoxlogo.png en-boy oranı
+const LOGO_ASPECT = 1                 // logo artık kare/yuvarlak (transparan köşeler)
 
 function Gate({ smooth }) {
   const group = useRef()
