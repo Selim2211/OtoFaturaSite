@@ -10,9 +10,9 @@
 const ROWS = [0, 1, 2, 3]
 const STAGES = ['01 — KAĞIT FATURA', '02 — TARANIYOR', '03 — DİJİTALLEŞİYOR', "04 — WOLVOX'A AKTARILDI"]
 
-/* Kart 160×208 px; kapı merkezi kartın 168 px sağında (aşağıdaki layout ile hizalı) */
-const FLY_X = '168px'
-const FLY_Y = '-4px'
+/* Kart 160×208 px; Wolvox kapısı kartın ~170 px sağında (aşağıdaki layout ile hizalı) */
+const FLY_X = '170px'
+const FLY_Y = '-2px'
 
 /* Deterministik pseudo-random (Scene3D'deki TransformParticles ile aynı fikir) */
 const rnd = (i, s) => {
@@ -34,8 +34,8 @@ const PARTICLES = new Array(18).fill(0).map((_, i) => ({
 export default function InvoiceStoryCard() {
   return (
     <div className="flex flex-col items-center gap-4">
-      {/* Sahne: solda kart, sağda Wolvox kapısı */}
-      <div className="relative w-[292px] h-[232px]">
+      {/* Sahne: solda kart, sağda Wolvox rozeti */}
+      <div className="relative w-[300px] h-[232px]">
         {/* Uçan katman (kart + kağıt + parçacıklar + ışın) */}
         <div
           className="story-flight absolute left-0 top-3 w-40 h-52 [perspective:900px]"
@@ -111,13 +111,23 @@ export default function InvoiceStoryCard() {
           </div>
         </div>
 
-        {/* Wolvox kapısı — kart buraya uçar */}
-        <div className="story-gate pointer-events-none absolute right-1 top-[84px] w-16 h-16 opacity-0">
-          <div className="story-gate-ring absolute inset-0 rounded-full border-2 border-signal shadow-[0_0_18px_2px_rgba(56,225,255,0.5)] border-dashed" />
-          <div className="story-gate-flash absolute inset-2 rounded-full bg-[#BFF6FF] opacity-0 blur-[2px]" />
-          <span className="absolute inset-0 flex items-center justify-center font-data text-[8px] font-bold tracking-widest text-signal/80">
-            WOLVOX
-          </span>
+        {/* Wolvox rozeti — kart buraya uçar, daireye Wolvox ERP logosu oturur */}
+        <div className="story-gate pointer-events-none absolute right-3 top-[78px] w-[76px] h-[76px] opacity-0">
+          {/* Dönen ışıklı dış halka */}
+          <div className="story-gate-ring absolute -inset-1 rounded-full border-2 border-dashed border-signal/70 shadow-[0_0_20px_3px_rgba(56,225,255,0.45)]" />
+          {/* Logo dairesi — logonun kendi mavisiyle dolu, ışık halkasıyla çevrili */}
+          <div className="absolute inset-0 rounded-full overflow-hidden border border-signal/60 bg-[#1c4e8f] shadow-[0_0_22px_2px_rgba(56,225,255,0.55),inset_0_2px_8px_rgba(255,255,255,0.18),inset_0_-6px_12px_rgba(0,0,0,0.35)]">
+            <img
+              src="/wolwoxlogo.png"
+              alt="Wolvox ERP"
+              className="absolute inset-0 h-full w-full object-contain p-1.5"
+              draggable="false"
+            />
+            {/* Üstten cam parlaması */}
+            <span className="absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/25 to-transparent" />
+          </div>
+          {/* Varış parlaması */}
+          <div className="story-gate-flash absolute inset-1 rounded-full bg-[#BFF6FF] opacity-0 blur-[2px]" />
         </div>
 
         {/* Aktarım onayı — kapının altında belirir */}
