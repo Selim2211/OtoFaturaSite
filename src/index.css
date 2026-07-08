@@ -146,45 +146,126 @@
   }
 }
 
-/* ---- Mobil "Kağıttan Dijitale" hikaye döngüsü (9s) ----
- * Zaman çizelgesi: 0-22% kağıt durur · 22-46% tarama ışını iner ·
- * 46-58% kağıt çevrilip yerini dijitale bırakır · 58-86% satırlar
- * yanar + rozet gelir · 86-100% başa sarım. */
+/* ---- Mobil "Kağıttan Dijitale" hikayesi (14s) ----
+ * Masaüstündeki 3D sahnenin (Scene3D, CYCLE=14s) birebir zaman çizelgesi.
+ * Yüzdeler Scene3D'deki `seg(p, a, b)` aralıklarıyla aynı:
+ *   0–42%  kağıt fatura      · 20–45%  tarama ışını iner
+ *   42–78% parçacık dönüşümü · 66–86%  dijital kart + satırlar + rozet
+ *   72–85% Wolvox kapısı     · 87–99%  karta uçuş + "Aktarım Başarılı"
+ * Yalnızca transform/opacity: her telefonda GPU'da, pil dostu. */
+
+/* Kağıt: belirir, hafif salınır, 42–60 arası parçacıklara "erir" */
 @keyframes storyPaper {
-  0%, 44%   { opacity: 1; transform: rotateY(0deg); }
-  56%, 88%  { opacity: 0; transform: rotateY(85deg); }
-  96%, 100% { opacity: 1; transform: rotateY(0deg); }
+  0%        { opacity: 0; transform: scale(0.94) rotate(-1.5deg); }
+  4%        { opacity: 1; transform: scale(1) rotate(-1.5deg); }
+  20%       { transform: scale(1) rotate(1.5deg); }
+  42%       { opacity: 1; transform: scale(1) rotate(-0.5deg); }
+  60%, 100% { opacity: 0; transform: scale(0.72) rotate(0deg); }
 }
-@keyframes storyDigital {
-  0%, 46%   { opacity: 0; transform: rotateY(-85deg); }
-  58%, 84%  { opacity: 1; transform: rotateY(0deg); }
-  92%, 100% { opacity: 0; transform: rotateY(-85deg); }
-}
+
+/* Tarama ışını: 20–45% arası tepeden dibe iner */
 @keyframes storyScan {
-  0%, 20%  { top: 6%; opacity: 0; }
-  25%      { opacity: 1; }
-  44%      { top: 86%; opacity: 1; }
-  48%, 100%{ top: 86%; opacity: 0; }
+  0%, 20%   { top: 4%; opacity: 0; }
+  24%       { opacity: 1; }
+  43%       { top: 90%; opacity: 1; }
+  46%, 100% { top: 90%; opacity: 0; }
 }
+
+/* Parçacıklar: kağıttan kopar (--sx/--sy savrulma) → karta toplanır (--cx/--cy) */
+@keyframes storyParticle {
+  0%, 42%   { opacity: 0; transform: translate(0, 0) scale(0.2); }
+  46%       { opacity: 1; transform: translate(calc(var(--sx) * 0.35), calc(var(--sy) * 0.35)) scale(1); }
+  62%       { opacity: 1; transform: translate(var(--sx), var(--sy)) scale(1); }
+  78%       { opacity: 0.85; transform: translate(var(--cx), var(--cy)) scale(0.55); }
+  82%, 100% { opacity: 0; transform: translate(var(--cx), var(--cy)) scale(0); }
+}
+
+/* Dijital kart: 66–80 belirir (flip), 99'da söner */
+@keyframes storyDigital {
+  0%, 66%   { opacity: 0; transform: rotateY(-70deg) scale(0.65); }
+  80%, 98%  { opacity: 1; transform: rotateY(0deg) scale(1); }
+  99%, 100% { opacity: 0; transform: rotateY(0deg) scale(1); }
+}
+
+/* Satır ışıkları sırayla yanar (per-row animation-delay) */
 @keyframes storyRow {
-  0%, 56%  { opacity: 0.15; }
-  64%, 84% { opacity: 1; }
-  92%, 100%{ opacity: 0.15; }
+  0%, 70%   { opacity: 0.12; }
+  78%, 96%  { opacity: 1; }
+  100%      { opacity: 0.12; }
 }
+
+/* %97 rozeti */
 @keyframes storyBadge {
-  0%, 66%  { opacity: 0; transform: scale(0.6); }
-  74%, 84% { opacity: 1; transform: scale(1); }
-  92%, 100%{ opacity: 0; transform: scale(0.6); }
+  0%, 80%   { opacity: 0; transform: scale(0.5); }
+  86%, 96%  { opacity: 1; transform: scale(1); }
+  100%      { opacity: 0; transform: scale(0.5); }
 }
-.story-paper   { animation: storyPaper 9s ease-in-out infinite; backface-visibility: hidden; }
-.story-digital { animation: storyDigital 9s ease-in-out infinite; backface-visibility: hidden; }
-.story-scan    { animation: storyScan 9s ease-in-out infinite; }
-.story-row     { animation: storyRow 9s ease-in-out infinite; }
-.story-badge   { animation: storyBadge 9s ease-in-out infinite; }
+
+/* Kartın Wolvox kapısına uçuşu (87–99) — kağıt/parçacık katmanını da taşır ama
+ * onlar o an zaten görünmez. `--fly-x` kart→kapı mesafesi. */
+@keyframes storyFlight {
+  0%, 87%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  99%       { transform: translate(var(--fly-x), var(--fly-y)) scale(0.16) rotate(8deg); opacity: 0; }
+  100%      { transform: translate(0, 0) scale(1); opacity: 1; }
+}
+
+/* Wolvox kapısı: 72–85 belirir, 93–98.5 varış parlaması */
+@keyframes storyGate {
+  0%, 72%   { opacity: 0; transform: scale(0.3); }
+  85%, 92%  { opacity: 1; transform: scale(1); }
+  96%       { transform: scale(1.16); }
+  99%, 100% { opacity: 1; transform: scale(1); }
+}
+@keyframes storyGateSpin { to { transform: rotate(360deg); } }
+@keyframes storyGateFlash {
+  0%, 93%   { opacity: 0; transform: scale(0.6); }
+  97%       { opacity: 0.75; transform: scale(1.05); }
+  100%      { opacity: 0; transform: scale(1.3); }
+}
+
+/* "AKTARIM BAŞARILI" onayı */
+@keyframes storySuccess {
+  0%, 93%   { opacity: 0; transform: translateY(8px) scale(0.85); }
+  97%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Aşama etiketi ve noktaları — Scene3D stageOf(): 20% / 55% / 85% eşikleri */
+@keyframes storyStage1 { 0%, 17% { opacity: 1; } 21%, 100% { opacity: 0; } }
+@keyframes storyStage2 { 0%, 19% { opacity: 0; } 23%, 52% { opacity: 1; } 56%, 100% { opacity: 0; } }
+@keyframes storyStage3 { 0%, 54% { opacity: 0; } 58%, 82% { opacity: 1; } 86%, 100% { opacity: 0; } }
+@keyframes storyStage4 { 0%, 84% { opacity: 0; } 88%, 100% { opacity: 1; } }
+@keyframes storyDot1 { 0%, 18% { width: 22px; background: #38E1FF; } 21%, 100% { width: 6px; background: rgba(255,255,255,0.15); } }
+@keyframes storyDot2 { 0%, 19% { width: 6px; background: rgba(255,255,255,0.15); } 22%, 53% { width: 22px; background: #38E1FF; } 56%, 100% { width: 6px; background: rgba(255,255,255,0.15); } }
+@keyframes storyDot3 { 0%, 54% { width: 6px; background: rgba(255,255,255,0.15); } 57%, 83% { width: 22px; background: #38E1FF; } 86%, 100% { width: 6px; background: rgba(255,255,255,0.15); } }
+@keyframes storyDot4 { 0%, 84% { width: 6px; background: rgba(255,255,255,0.15); } 87%, 100% { width: 22px; background: #38E1FF; } }
+
+.story-paper    { animation: storyPaper 14s ease-in-out infinite; backface-visibility: hidden; }
+.story-scan     { animation: storyScan 14s ease-in-out infinite; }
+.story-particle { animation: storyParticle 14s ease-in-out infinite; will-change: transform, opacity; }
+.story-digital  { animation: storyDigital 14s ease-in-out infinite; backface-visibility: hidden; }
+.story-row      { animation: storyRow 14s ease-in-out infinite; }
+.story-badge    { animation: storyBadge 14s ease-in-out infinite; }
+.story-flight   { animation: storyFlight 14s ease-in-out infinite; will-change: transform, opacity; }
+.story-gate     { animation: storyGate 14s ease-out infinite; }
+.story-gate-ring{ animation: storyGateSpin 7s linear infinite; }
+.story-gate-flash { animation: storyGateFlash 14s ease-out infinite; }
+.story-success  { animation: storySuccess 14s ease-out infinite; }
+.story-stage-1  { animation: storyStage1 14s linear infinite; }
+.story-stage-2  { animation: storyStage2 14s linear infinite; }
+.story-stage-3  { animation: storyStage3 14s linear infinite; }
+.story-stage-4  { animation: storyStage4 14s linear infinite; }
+.story-dot-1    { animation: storyDot1 14s linear infinite; }
+.story-dot-2    { animation: storyDot2 14s linear infinite; }
+.story-dot-3    { animation: storyDot3 14s linear infinite; }
+.story-dot-4    { animation: storyDot4 14s linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
-  /* Hareket azaltılmışsa hikaye kartı sabit kağıt halinde kalır — kırık görüntü yok */
-  .story-digital { opacity: 0 !important; }
-  .story-scan, .story-badge { opacity: 0 !important; }
+  /* Hareket azaltılmışsa hikaye sabit kağıt halinde kalır — kırık görüntü yok */
+  .story-paper { opacity: 1 !important; }
+  .story-digital, .story-scan, .story-badge, .story-particle,
+  .story-gate, .story-gate-flash, .story-success { opacity: 0 !important; }
+  .story-stage-1 { opacity: 1 !important; }
+  .story-stage-2, .story-stage-3, .story-stage-4 { opacity: 0 !important; }
+  .story-dot-1 { width: 22px !important; background: #38E1FF !important; }
 }
