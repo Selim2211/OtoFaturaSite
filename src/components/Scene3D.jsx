@@ -324,8 +324,8 @@ function DigitalCard({ smooth }) {
 }
 
 /* Wolvox'u temsil eden ışık kapısı + "AKTARIM BAŞARILI" onayı */
-const LOGO_BLUE = '#1b4d8e'          // logonun zemin mavisi — disk aynı renk, dikiş görünmez
-const LOGO_ASPECT = 376 / 690        // wolwoxlogo.png en-boy oranı
+const LOGO_BLUE = '#0b4d8e'          // logonun zemin mavisi (pikselden ölçüldü) — disk aynı renk
+const LOGO_ASPECT = 386 / 682        // wolwoxlogo.png en-boy oranı
 
 function Gate({ smooth }) {
   const group = useRef()
@@ -369,7 +369,7 @@ function Gate({ smooth }) {
     }
   })
 
-  const logoW = 0.62
+  const logoW = 0.82
   return (
     <group ref={group} position={GATE_POS.toArray()} visible={false}>
       {/* Neon dış halka (döner) */}

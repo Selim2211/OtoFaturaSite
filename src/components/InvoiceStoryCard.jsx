@@ -115,16 +115,17 @@ export default function InvoiceStoryCard() {
         <div className="story-gate pointer-events-none absolute right-3 top-[78px] w-[76px] h-[76px] opacity-0">
           {/* Dönen ışıklı dış halka */}
           <div className="story-gate-ring absolute -inset-1 rounded-full border-2 border-dashed border-signal/70 shadow-[0_0_20px_3px_rgba(56,225,255,0.45)]" />
-          {/* Logo dairesi — logonun kendi mavisiyle dolu, ışık halkasıyla çevrili */}
-          <div className="absolute inset-0 rounded-full overflow-hidden border border-signal/60 bg-[#1c4e8f] shadow-[0_0_22px_2px_rgba(56,225,255,0.55),inset_0_2px_8px_rgba(255,255,255,0.18),inset_0_-6px_12px_rgba(0,0,0,0.35)]">
+          {/* Logo dairesi — zemin logonun tam mavisi (#0b4d8e), dikiş görünmez */}
+          <div className="absolute inset-0 rounded-full overflow-hidden border border-signal/60 bg-[#0b4d8e] shadow-[0_0_22px_2px_rgba(56,225,255,0.55),inset_0_2px_8px_rgba(255,255,255,0.18),inset_0_-6px_12px_rgba(0,0,0,0.35)]">
+            {/* Mavi tüm daireyi doldurur; logo içeriği (amblem + WOLVOX ERP) ortada */}
             <img
               src="/wolwoxlogo.png"
               alt="Wolvox ERP"
-              className="absolute inset-0 h-full w-full object-contain p-1.5"
+              className="absolute left-1/2 top-1/2 w-[112%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
               draggable="false"
             />
             {/* Üstten cam parlaması */}
-            <span className="absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/25 to-transparent" />
+            <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full bg-gradient-to-b from-white/25 to-transparent" />
           </div>
           {/* Varış parlaması */}
           <div className="story-gate-flash absolute inset-1 rounded-full bg-[#BFF6FF] opacity-0 blur-[2px]" />
