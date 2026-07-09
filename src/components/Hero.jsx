@@ -8,7 +8,7 @@ import InvoiceStoryCard from './InvoiceStoryCard'
 
 const Scene3D = lazy(() => import('./Scene3D'))
 
-const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.0.4.exe'
+const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.0.5.exe'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -105,7 +105,7 @@ export default function Hero() {
               className="group inline-flex items-center gap-2.5 bg-gradient-to-r from-brand-700 to-brand-500 hover:from-brand-600 hover:to-signal text-white font-bold px-6 py-3.5 rounded-xl transition-all duration-200 glow-blue hover:scale-[1.03] text-sm cursor-pointer"
             >
               <Download size={16} />
-              Hemen İndir (v1.0.4)
+              Hemen İndir (v1.0.5)
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </a>
             <a
