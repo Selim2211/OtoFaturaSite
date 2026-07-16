@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Download, Menu, X, Phone } from 'lucide-react'
 
-const DOWNLOAD_URL = 'https://github.com/Selim2211/OtoFaturaSite/releases/download/v1.0/OtoFaturaKurulum_v1.1.0.exe'
+import { APP_VERSION, DOWNLOAD_URL } from '../config'
+
 const PHONE_DISPLAY = '0543 374 30 60'
 const PHONE_TEL = '+905433743060'
 
@@ -71,7 +72,7 @@ export default function Navbar() {
             className="flex items-center gap-2 bg-gradient-to-r from-brand-700 to-brand-500 hover:from-brand-600 hover:to-signal text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-all duration-200 glow-blue cursor-pointer"
           >
             <Download size={14} />
-            Hemen İndir
+            Hemen İndir (v{APP_VERSION})
           </a>
         </div>
 
@@ -107,7 +108,7 @@ export default function Navbar() {
             className="flex items-center justify-center gap-2 bg-gradient-to-r from-brand-700 to-brand-500 text-white text-sm font-semibold px-4 py-3 rounded-lg my-3"
           >
             <Download size={14} />
-            Hemen İndir
+            Hemen İndir (v{APP_VERSION})
           </a>
         </motion.div>
       )}
